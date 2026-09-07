@@ -3,6 +3,32 @@
 Answer natural-language questions about **any** transactional CSV it has never seen —
 infer the schema from the file itself, no code changes per dataset.
 
+## See it run
+
+Three short recordings, in order. Each has one thing to watch for.
+
+![Ingesting a CSV while the stage tree assembles](docs/gifs/01-ingest-and-stage-tree.gif)
+
+**1. Ingest and the stage tree.** The file arrives and the stage tree assembles through
+sniffing, profiling, date resolution, inference, verification, and promotion: the work is
+visible rather than hidden behind a spinner.
+
+![The Semantic Model as a readable artifact, then a question answered](docs/gifs/02-understanding-and-answer.gif)
+
+**2. The understanding, then an answer.** The model's understanding is a readable artifact:
+each column's role with a confidence, whether it came from the model, and the verifier result
+that confirmed or refuted it, then an answer that states its formula and the SQL it ran.
+
+![A model proposal refuted by a verifier, and the dependent capabilities withdrawn](docs/gifs/03-refusal.gif)
+
+**3. A proposal refuted, and the capabilities that depended on it withdrawn.** `order_ref` was
+proposed as the transaction key **by the model**, but the deterministic verifier disproved it
+with evidence (`transaction_key_shares_time: 0.0000 of 0 multi-row order_ref groups share one
+event`), so its confidence reads 0.00 and it is badged **REFUTED**. Directly below, `order_count`
+and `basket_cooccurrence` are marked **not available**. That is the whole thesis in one frame: the
+model proposed, the deterministic layer disproved it with evidence, and the system **withdrew the
+capabilities that depended on it** rather than answering anyway.
+
 The design principle everything follows from: the system's *understanding* of a file
 is a first-class, machine-checked artifact (a **Semantic Model** with evidence and
 confidence), and every answer is a **typed plan validated against that model before
