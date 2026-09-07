@@ -1,0 +1,23 @@
+{
+  "request": {
+    "model": "claude-sonnet-4-5",
+    "system": "smoke test provider seam",
+    "prompt": "reply with ok=true",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ok"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "response": {
+    "ok": true
+  },
+  "recorded_by": "canned"
+}

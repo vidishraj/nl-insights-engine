@@ -1,0 +1,169 @@
+{
+  "request": {
+    "model": "claude-sonnet-4-5",
+    "system": "You assign each column of a transactional table exactly one ROLE from a fixed, generic ontology. You are given, per column, only statistical evidence: semantic type, null rate, cardinality, uniqueness, numeric sign structure, top values, a sample of values, and the functional dependencies it participates in (with a strength and a support count). A column's NAME may be present but is only a weak hint — the same table may arrive with no header at all, so decide from the evidence. Roles:\n- event_time: when a transaction occurred (a date/timestamp).\n- transaction_key: groups line items into one transaction; high cardinality but recurring, and it strongly determines the event_time (see the dependencies).\n- entity_key: identifies an entity; set 'entity' to customer, product, location, or other.\n- additive_quantity: a count that sums meaningfully (integer-dominant; may be negative for returns).\n- monetary_rate: a per-unit price (decimal-bearing; NOT additive across a transaction).\n- monetary_amount: an extended amount, i.e. quantity times rate (additive).\n- discount: a reduction applied to an amount.\n- dimension: a categorical to slice by (country, category, ...).\n- flag: a boolean/indicator column.\n- description: free text describing an entity.\n- ignore: opaque notes/ids with no analytical role.\nGive a confidence in [0,1] and short evidence-grounded reasons. Every column gets exactly one claim.",
+    "prompt": "Assign a role to every column. Evidence (JSON):\n{\"row_count\":541909,\"columns\":[{\"name\":\"InvoiceNo\",\"semantic_type\":\"text\",\"null_rate\":0.0,\"distinct_count\":25900,\"uniqueness_ratio\":0.047794002314041656,\"min_value\":\"536365\",\"max_value\":\"C581569\",\"integer_ratio\":null,\"sign_mix\":null,\"top_values\":[{\"value\":\"573585\",\"count\":1114},{\"value\":\"581219\",\"count\":749},{\"value\":\"581492\",\"count\":731},{\"value\":\"580729\",\"count\":721},{\"value\":\"558475\",\"count\":705},{\"value\":\"579777\",\"count\":687},{\"value\":\"581217\",\"count\":676},{\"value\":\"537434\",\"count\":675},{\"value\":\"580730\",\"count\":662},{\"value\":\"538071\",\"count\":652}],\"samples\":[\"536365\",\"536366\",\"536367\",\"536368\",\"536369\"],\"determines\":[{\"other\":\"CustomerID\",\"strength\":1.0,\"support\":20059},{\"other\":\"Country\",\"strength\":1.0,\"support\":20059},{\"other\":\"InvoiceDate\",\"strength\":0.9978563238446583,\"support\":20059}],\"determined_by\":[]},{\"name\":\"StockCode\",\"semantic_type\":\"text\",\"null_rate\":0.0,\"distinct_count\":4070,\"uniqueness_ratio\":0.0075104860779208315,\"min_value\":\"10002\",\"max_value\":\"m\",\"integer_ratio\":null,\"sign_mix\":null,\"top_values\":[{\"value\":\"85123A\",\"count\":2313},{\"value\":\"22423\",\"count\":2203},{\"value\":\"85099B\",\"count\":2159},{\"value\":\"47566\",\"count\":1727},{\"value\":\"20725\",\"count\":1639},{\"value\":\"84879\",\"count\":1502},{\"value\":\"22720\",\"count\":1477},{\"value\":\"22197\",\"count\":1476},{\"value\":\"21212\",\"count\":1385},{\"value\":\"20727\",\"count\":1350}],\"samples\":[\"10002\",\"10080\",\"10120\",\"10123C\",\"10123G\"],\"determines\":[],\"determined_by\":[{\"other\":\"Description\",\"strength\":0.9558222676200204,\"support\":3916}]},{\"name\":\"Description\",\"semantic_type\":\"text\",\"null_rate\":0.002683107311375157,\"distinct_count\":4223,\"uniqueness_ratio\":0.007813786531718644,\"min_value\":\" 4 PURPLE FLOCK DINNER CANDLES\",\"max_value\":\"wrongly sold sets\",\"integer_ratio\":null,\"sign_mix\":null,\"top_values\":[{\"value\":\"WHITE HANGING HEART T-LIGHT HOLDER\",\"count\":2369},{\"value\":\"REGENCY CAKESTAND 3 TIER\",\"count\":2200},{\"value\":\"JUMBO BAG RED RETROSPOT\",\"count\":2159},{\"value\":\"PARTY BUNTING\",\"count\":1727},{\"value\":\"LUNCH BAG RED RETROSPOT\",\"count\":1638},{\"value\":\"ASSORTED COLOUR BIRD ORNAMENT\",\"count\":1501},{\"value\":\"SET OF 3 CAKE TINS PANTRY DESIGN \",\"count\":1473},{\"value\":\"PACK OF 72 RETROSPOT CAKE CASES\",\"count\":1385},{\"value\":\"LUNCH BAG  BLACK SKULL.\",\"count\":1350},{\"value\":\"NATURAL SLATE HEART CHALKBOARD \",\"count\":1280}],\"samples\":[\" 4 PURPLE FLOCK DINNER CANDLES\",\" 50'S CHRISTMAS GIFT BAG LARGE\",\" DOLLY GIRL BEAKER\",\" I LOVE LONDON MINI BACKPACK\",\" I LOVE LONDON MINI RUCKSACK\"],\"determines\":[{\"other\":\"StockCode\",\"strength\":0.9558222676200204,\"support\":3916}],\"determined_by\":[]},{\"name\":\"Quantity\",\"semantic_type\":\"integer\",\"null_rate\":0.0,\"distinct_count\":722,\"uniqueness_ratio\":0.0013323270143142114,\"min_value\":\"-80995\",\"max_value\":\"80995\",\"integer_ratio\":1.0,\"sign_mix\":{\"negatives\":10624,\"zeros\":0,\"positives\":531285},\"top_values\":[{\"value\":\"1\",\"count\":148227},{\"value\":\"2\",\"count\":81829},{\"value\":\"12\",\"count\":61063},{\"value\":\"6\",\"count\":40868},{\"value\":\"4\",\"count\":38484},{\"value\":\"3\",\"count\":37121},{\"value\":\"24\",\"count\":24021},{\"value\":\"10\",\"count\":22288},{\"value\":\"8\",\"count\":13129},{\"value\":\"5\",\"count\":11757}],\"samples\":[\"-1\",\"-10\",\"-100\",\"-1000\",\"-101\"],\"determines\":[],\"determined_by\":[]},{\"name\":\"InvoiceDate\",\"semantic_type\":\"text\",\"null_rate\":0.0,\"distinct_count\":23260,\"uniqueness_ratio\":0.04292233566890382,\"min_value\":\"01/04/2011 10:00\",\"max_value\":\"12/23/2010 17:41\",\"integer_ratio\":null,\"sign_mix\":null,\"top_values\":[{\"value\":\"10/31/2011 14:41\",\"count\":1114},{\"value\":\"12/08/2011 09:28\",\"count\":749},{\"value\":\"12/09/2011 10:03\",\"count\":731},{\"value\":\"12/05/2011 17:24\",\"count\":721},{\"value\":\"06/29/2011 15:58\",\"count\":705},{\"value\":\"11/30/2011 15:13\",\"count\":687},{\"value\":\"12/08/2011 09:20\",\"count\":676},{\"value\":\"12/06/2010 16:57\",\"count\":675},{\"value\":\"12/05/2011 17:28\",\"count\":662},{\"value\":\"12/09/2010 14:09\",\"count\":652}],\"samples\":[\"01/04/2011 10:00\",\"01/04/2011 10:09\",\"01/04/2011 10:12\",\"01/04/2011 10:15\",\"01/04/2011 10:16\"],\"determines\":[{\"other\":\"Country\",\"strength\":0.9813860553160164,\"support\":19018}],\"determined_by\":[{\"other\":\"InvoiceNo\",\"strength\":0.9978563238446583,\"support\":20059}]},{\"name\":\"UnitPrice\",\"semantic_type\":\"decimal\",\"null_rate\":0.0,\"distinct_count\":1630,\"uniqueness_ratio\":0.0030078850877176795,\"min_value\":\"-11062.06\",\"max_value\":\"38970.0\",\"integer_ratio\":0.008309513220854424,\"sign_mix\":{\"negatives\":2,\"zeros\":2515,\"positives\":539392},\"top_values\":[{\"value\":\"1.25\",\"count\":50496},{\"value\":\"1.65\",\"count\":38181},{\"value\":\"0.85\",\"count\":28497},{\"value\":\"2.95\",\"count\":27768},{\"value\":\"0.42\",\"count\":24533},{\"value\":\"4.95\",\"count\":19040},{\"value\":\"3.75\",\"count\":18600},{\"value\":\"2.1\",\"count\":17697},{\"value\":\"2.46\",\"count\":17091},{\"value\":\"2.08\",\"count\":17005}],\"samples\":[\"-11062.06\",\"0.0\",\"0.001\",\"0.01\",\"0.03\"],\"determines\":[],\"determined_by\":[]},{\"name\":\"CustomerID\",\"semantic_type\":\"integer\",\"null_rate\":0.249266943342886,\"distinct_count\":4372,\"uniqueness_ratio\":0.010746529868814662,\"min_value\":\"12346\",\"max_value\":\"18287\",\"integer_ratio\":1.0,\"sign_mix\":{\"negatives\":0,\"zeros\":0,\"positives\":406829},\"top_values\":[{\"value\":\"17841\",\"count\":7983},{\"value\":\"14911\",\"count\":5903},{\"value\":\"14096\",\"count\":5128},{\"value\":\"12748\",\"count\":4642},{\"value\":\"14606\",\"count\":2782},{\"value\":\"15311\",\"count\":2491},{\"value\":\"14646\",\"count\":2085},{\"value\":\"13089\",\"count\":1857},{\"value\":\"13263\",\"count\":1677},{\"value\":\"14298\",\"count\":1640}],\"samples\":[\"12346\",\"12347\",\"12348\",\"12349\",\"12350\"],\"determines\":[{\"other\":\"Country\",\"strength\":0.9979040521658128,\"support\":4294}],\"determined_by\":[{\"other\":\"InvoiceNo\",\"strength\":1.0,\"support\":20059}]},{\"name\":\"Country\",\"semantic_type\":\"text\",\"null_rate\":0.0,\"distinct_count\":38,\"uniqueness_ratio\":0.00007012247443759008,\"min_value\":\"Australia\",\"max_value\":\"Unspecified\",\"integer_ratio\":null,\"sign_mix\":null,\"top_values\":[{\"value\":\"United Kingdom\",\"count\":495478},{\"value\":\"Germany\",\"count\":9495},{\"value\":\"France\",\"count\":8557},{\"value\":\"EIRE\",\"count\":8196},{\"value\":\"Spain\",\"count\":2533},{\"value\":\"Netherlands\",\"count\":2371},{\"value\":\"Belgium\",\"count\":2069},{\"value\":\"Switzerland\",\"count\":2002},{\"value\":\"Portugal\",\"count\":1519},{\"value\":\"Australia\",\"count\":1259}],\"samples\":[\"Australia\",\"Austria\",\"Bahrain\",\"Belgium\",\"Brazil\"],\"determines\":[],\"determined_by\":[{\"other\":\"InvoiceNo\",\"strength\":1.0,\"support\":20059},{\"other\":\"CustomerID\",\"strength\":0.9979040521658128,\"support\":4294},{\"other\":\"InvoiceDate\",\"strength\":0.9813860553160164,\"support\":19018}]}]}",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "claims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "column": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "event_time",
+                  "transaction_key",
+                  "entity_key",
+                  "additive_quantity",
+                  "monetary_rate",
+                  "monetary_amount",
+                  "discount",
+                  "dimension",
+                  "flag",
+                  "description",
+                  "ignore"
+                ]
+              },
+              "entity": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "customer",
+                  "product",
+                  "location",
+                  "other",
+                  null
+                ]
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "column",
+              "role",
+              "confidence",
+              "reasons"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "claims"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "response": {
+    "claims": [
+      {
+        "column": "InvoiceNo",
+        "role": "transaction_key",
+        "entity": null,
+        "confidence": 0.98,
+        "reasons": [
+          "Moderate cardinality (25,900 distinct) with low uniqueness (0.048) indicating values recur ~21 times—consistent with line-item grouping",
+          "Strongly determines CustomerID (1.0) and InvoiceDate (0.998), the hallmark of a transaction header",
+          "Top value appears 1,114 times, matching multi-line transaction pattern"
+        ]
+      },
+      {
+        "column": "StockCode",
+        "role": "entity_key",
+        "entity": "product",
+        "confidence": 0.95,
+        "reasons": [
+          "4,070 distinct values—product catalog scale",
+          "Nearly 1:1 correspondence with Description (determined by it at 0.956 strength)",
+          "Alphanumeric codes like '85123A', '22423' are typical SKU identifiers"
+        ]
+      },
+      {
+        "column": "Description",
+        "role": "description",
+        "entity": null,
+        "confidence": 0.97,
+        "reasons": [
+          "Free text with product names: 'WHITE HANGING HEART T-LIGHT HOLDER', 'REGENCY CAKESTAND 3 TIER'",
+          "Nearly 1:1 with StockCode (determines it at 0.956), confirming product label role",
+          "Minimal nulls (0.27%)—expected for product master data"
+        ]
+      },
+      {
+        "column": "Quantity",
+        "role": "additive_quantity",
+        "entity": null,
+        "confidence": 0.99,
+        "reasons": [
+          "Pure integer (1.0 ratio) with small typical values (1, 2, 12, 6) matching item counts",
+          "10,624 negative rows out of 541,909—consistent with returns/cancellations in transactional data",
+          "Summing quantities across a transaction is analytically meaningful"
+        ]
+      },
+      {
+        "column": "InvoiceDate",
+        "role": "event_time",
+        "entity": null,
+        "confidence": 0.99,
+        "reasons": [
+          "Timestamp format 'MM/DD/YYYY HH:MM' with 23,260 distinct values—typical event granularity",
+          "Strongly determined by InvoiceNo (0.998), placing it at transaction scope",
+          "Determines Country (0.981), consistent with it being the authoritative transaction timestamp"
+        ]
+      },
+      {
+        "column": "UnitPrice",
+        "role": "monetary_rate",
+        "entity": null,
+        "confidence": 0.96,
+        "reasons": [
+          "Decimal-dominant (integer_ratio 0.008) with values like 1.25, 1.65, 0.85—per-unit prices",
+          "NOT additive: summing unit prices across a transaction is nonsensical",
+          "2,515 zero-price rows likely promotional/sample items; 2 negatives may be adjustment artifacts"
+        ]
+      },
+      {
+        "column": "CustomerID",
+        "role": "entity_key",
+        "entity": "customer",
+        "confidence": 0.94,
+        "reasons": [
+          "4,372 distinct IDs with moderate reuse (top customer has 7,983 transactions)—customer base scale",
+          "Determines Country (0.998), reflecting stable customer location attribute",
+          "25% null rate suggests guest/anonymous checkouts, common in retail"
+        ]
+      },
+      {
+        "column": "Country",
+        "role": "dimension",
+        "entity": null,
+        "confidence": 0.98,
+        "reasons": [
+          "38 distinct categorical values ('United Kingdom', 'Germany', 'France')—classic geographic dimension",
+          "Determined by CustomerID and InvoiceNo, positioning it as a denormalized attribute for slicing",
+          "Heavily skewed (UK: 495k of 542k rows)—typical for location-based analysis"
+        ]
+      }
+    ]
+  },
+  "recorded_by": "recorded (ambient)",
+  "recorded_model": "claude-sonnet-4-5",
+  "recorded_at": "2026-09-05"
+}

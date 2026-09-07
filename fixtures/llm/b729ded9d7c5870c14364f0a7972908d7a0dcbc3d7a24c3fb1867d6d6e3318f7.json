@@ -1,0 +1,459 @@
+{
+  "request": {
+    "model": "claude-sonnet-4-5",
+    "system": "You translate a business question into a small typed query plan (the schema you are given). Use ONLY the measures and dimensions named in the provided semantic model; never invent a column or write SQL. Reference measures by their name and dimensions/entities by their column. Prefer the measure algebra over raw columns. Measure NAMES are generic (revenue/units/orders) and often will NOT match this dataset's domain; each measure lists the actual 'columns' it computes over, which carry the dataset's own words. Map the user's term to the measure whose columns MEAN what the user means, EVEN WHEN the user's wording differs from the column's name: the user names a CONCEPT, not necessarily a column, so a measure summing (say) a 'haulage_outlay' column answers 'total shipping spend'. Do not refuse a computable question merely because its wording is not the generic noun. If the question's core MEASURE is not one the model offers (it names a quantity for which the model lists no columns), do NOT substitute a different measure — list the missing concept in 'unmet_concepts' and leave measures empty; a substituted answer is wrong. If the question asks to GROUP BY or FILTER ON an attribute that is not an available dimension/entity column (an attribute this dataset has no column for), but the MEASURE itself is computable, do NOT drop the grouping and return an ungrouped total, and do NOT substitute a different column — list the user's term in 'unmet_dimensions'; a requested breakdown that silently becomes a scalar, or regroups by a different dimension, is a wrong answer. (But if the PRIMARY thing the question asks to count or measure does not exist at all — an entity this dataset does not record — that is an unmet CONCEPT: put it in 'unmet_concepts', not 'unmet_dimensions'.) For a plain COUNT of rows ('how many X are there') use aggregations=[{func:'count'}] (no column) — it always applies. To summarise an ordinary NUMERIC column that is not a named measure (an average, min, max, or sum of a value listed in numeric_columns), use aggregations=[{func:'avg'|'sum'|'min'|'max', column:<that column>}]; prefer a named measure when one fits, and use a generic aggregation for the rest. Only genuinely cosmetic parts you cannot express go in 'notes'. For a whole named month or quarter use time.named_period (a month as 'YYYY-MM', a quarter as 'YYYY-Qn'), NOT start/end; start is inclusive and end is EXCLUSIVE. Return the plan and nothing else.",
+    "prompt": "Semantic model:\n{\"measures\": [{\"name\": \"net_revenue\", \"expression\": \"sum(additive_quantity \\u00d7 monetary_rate)  [derived]\", \"columns\": [\"quantity\", \"unit_price\"], \"available\": true}, {\"name\": \"gross_revenue\", \"expression\": \"sum(additive_quantity \\u00d7 monetary_rate)  [derived] over non-return rows\", \"columns\": [\"quantity\", \"unit_price\"], \"available\": true}, {\"name\": \"units_sold\", \"expression\": \"sum(additive_quantity)\", \"columns\": [\"quantity\"], \"available\": true}, {\"name\": \"order_count\", \"expression\": \"count(distinct transaction_key)\", \"columns\": [\"order_id\"], \"available\": true}, {\"name\": \"basket_cooccurrence\", \"expression\": \"products appearing together within a transaction_key\", \"columns\": [\"order_id\"], \"available\": true}], \"dimensions\": [], \"entities\": [{\"column\": \"product\", \"entity\": \"product\"}, {\"column\": \"customer\", \"entity\": \"customer\"}], \"numeric_columns\": [\"order_id\", \"quantity\", \"unit_price\"], \"event_time\": \"order_date\", \"time_grains\": [\"day\", \"week\", \"month\", \"quarter\", \"year\"], \"returns_convention\": \"derived_negative_quantity\", \"partition_defaults\": [], \"period_completeness\": []}\n\nQuestion: how many distinct suppliers are there\n\nEmit the query plan.",
+    "schema": {
+      "$defs": {
+        "Aggregation": {
+          "description": "A GENERIC aggregation over a column, for questions the named measure algebra does not\ncover: counting rows, or averaging/summing/min/max of an ordinary numeric column that is\nnot part of a revenue definition (a fare, a life expectancy, a diamond price). This is\nwhat lets an unfamiliar, non-retail file still answer 'how many rows' and 'average X'.",
+          "properties": {
+            "func": {
+              "enum": [
+                "count",
+                "sum",
+                "avg",
+                "min",
+                "max"
+              ],
+              "title": "Func",
+              "type": "string"
+            },
+            "column": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Column"
+            }
+          },
+          "required": [
+            "func"
+          ],
+          "title": "Aggregation",
+          "type": "object"
+        },
+        "CategoricalFilter": {
+          "properties": {
+            "column": {
+              "title": "Column",
+              "type": "string"
+            },
+            "op": {
+              "default": "in",
+              "enum": [
+                "in",
+                "not_in"
+              ],
+              "title": "Op",
+              "type": "string"
+            },
+            "values": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "column"
+          ],
+          "title": "CategoricalFilter",
+          "type": "object"
+        },
+        "FrequencyConstraint": {
+          "description": "Per-entity transaction frequency, e.g. customers who bought exactly once.",
+          "properties": {
+            "entity": {
+              "title": "Entity",
+              "type": "string"
+            },
+            "count_of": {
+              "title": "Count Of",
+              "type": "string"
+            },
+            "op": {
+              "default": "eq",
+              "enum": [
+                "eq",
+                "lte",
+                "gte"
+              ],
+              "title": "Op",
+              "type": "string"
+            },
+            "n": {
+              "default": 1,
+              "title": "N",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "entity",
+            "count_of"
+          ],
+          "title": "FrequencyConstraint",
+          "type": "object"
+        },
+        "Grain": {
+          "enum": [
+            "day",
+            "week",
+            "month",
+            "quarter",
+            "year"
+          ],
+          "title": "Grain",
+          "type": "string"
+        },
+        "NumericFilter": {
+          "properties": {
+            "column": {
+              "title": "Column",
+              "type": "string"
+            },
+            "op": {
+              "enum": [
+                "gt",
+                "gte",
+                "lt",
+                "lte",
+                "eq",
+                "between"
+              ],
+              "title": "Op",
+              "type": "string"
+            },
+            "value": {
+              "title": "Value",
+              "type": "number"
+            },
+            "value2": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Value2"
+            }
+          },
+          "required": [
+            "column",
+            "op",
+            "value"
+          ],
+          "title": "NumericFilter",
+          "type": "object"
+        },
+        "PeriodComparison": {
+          "description": "Compare a measure across two periods (e.g. growth between quarters).",
+          "properties": {
+            "grain": {
+              "$ref": "#/$defs/Grain"
+            },
+            "period_a": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Period A"
+            },
+            "period_b": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Period B"
+            },
+            "kind": {
+              "default": "growth",
+              "enum": [
+                "growth",
+                "change",
+                "ratio"
+              ],
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          "required": [
+            "grain"
+          ],
+          "title": "PeriodComparison",
+          "type": "object"
+        },
+        "TimeWindow": {
+          "properties": {
+            "grain": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Grain"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "bucket size for grouping or period comparison"
+            },
+            "start": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "INCLUSIVE lower bound, full ISO date 'YYYY-MM-DD'",
+              "title": "Start"
+            },
+            "end": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "EXCLUSIVE upper bound, full ISO date 'YYYY-MM-DD' — the first day AFTER the range (a whole month becomes the 1st of the FOLLOWING month, not the last day of the month). For a whole named month/quarter use named_period instead.",
+              "title": "End"
+            },
+            "last_n": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "the last N periods at 'grain'",
+              "title": "Last N"
+            },
+            "named_period": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "PREFER this for a whole named period: a month as 'YYYY-MM' or a quarter as 'YYYY-Qn'. Do NOT also set start/end when using it.",
+              "title": "Named Period"
+            }
+          },
+          "title": "TimeWindow",
+          "type": "object"
+        },
+        "TopK": {
+          "properties": {
+            "measure": {
+              "title": "Measure",
+              "type": "string"
+            },
+            "k": {
+              "default": 10,
+              "minimum": 1,
+              "title": "K",
+              "type": "integer"
+            },
+            "direction": {
+              "default": "desc",
+              "title": "Direction",
+              "type": "string"
+            }
+          },
+          "required": [
+            "measure"
+          ],
+          "title": "TopK",
+          "type": "object"
+        }
+      },
+      "description": "A typed analytical plan proposed by the interpreter, disposed by the binder.",
+      "properties": {
+        "intent": {
+          "default": "",
+          "title": "Intent",
+          "type": "string"
+        },
+        "measures": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Measures",
+          "type": "array"
+        },
+        "group_by": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Group By",
+          "type": "array"
+        },
+        "categorical_filters": {
+          "items": {
+            "$ref": "#/$defs/CategoricalFilter"
+          },
+          "title": "Categorical Filters",
+          "type": "array"
+        },
+        "numeric_filters": {
+          "items": {
+            "$ref": "#/$defs/NumericFilter"
+          },
+          "title": "Numeric Filters",
+          "type": "array"
+        },
+        "time": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TimeWindow"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "top_k": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TopK"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "period_comparison": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PeriodComparison"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "share_of_total": {
+          "default": false,
+          "title": "Share Of Total",
+          "type": "boolean"
+        },
+        "distinct_count_of": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Distinct Count Of"
+        },
+        "frequency": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FrequencyConstraint"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "basket": {
+          "default": false,
+          "title": "Basket",
+          "type": "boolean"
+        },
+        "aggregations": {
+          "items": {
+            "$ref": "#/$defs/Aggregation"
+          },
+          "title": "Aggregations",
+          "type": "array"
+        },
+        "unmet_concepts": {
+          "description": "measures/concepts the question asked for that are NOT in the semantic model (a quantity for which the model lists no columns). List them here and do NOT substitute a different measure — a substituted answer to a different question is wrong.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Unmet Concepts",
+          "type": "array"
+        },
+        "unmet_dimensions": {
+          "description": "attributes the question asked to break down BY or filter ON that are NOT available dimension/entity columns (an attribute this dataset has no column for). List the user's term here and do NOT drop the grouping to return an ungrouped total or substitute another column — a breakdown that silently collapses to a scalar, or regroups by a different dimension, is a wrong answer to a different question.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Unmet Dimensions",
+          "type": "array"
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        }
+      },
+      "title": "QueryIR",
+      "type": "object"
+    }
+  },
+  "response": {
+    "intent": "count distinct suppliers",
+    "measures": [],
+    "group_by": [],
+    "categorical_filters": [],
+    "numeric_filters": [],
+    "time": null,
+    "top_k": null,
+    "period_comparison": null,
+    "share_of_total": false,
+    "distinct_count_of": null,
+    "frequency": null,
+    "basket": false,
+    "aggregations": [],
+    "unmet_concepts": [
+      "supplier"
+    ],
+    "unmet_dimensions": [],
+    "notes": []
+  },
+  "recorded_by": "recorded (ambient)",
+  "recorded_model": "claude-sonnet-4-5",
+  "recorded_at": "2026-09-05"
+}

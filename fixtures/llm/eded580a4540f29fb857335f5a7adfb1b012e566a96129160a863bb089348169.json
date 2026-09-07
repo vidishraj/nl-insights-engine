@@ -1,0 +1,147 @@
+{
+  "request": {
+    "model": "claude-sonnet-4-5",
+    "system": "You assign each column of a transactional table exactly one ROLE from a fixed, generic ontology. You are given, per column, only statistical evidence: semantic type, null rate, cardinality, uniqueness, numeric sign structure, top values, a sample of values, and the functional dependencies it participates in (with a strength and a support count). A column's NAME may be present but is only a weak hint — the same table may arrive with no header at all, so decide from the evidence. Roles:\n- event_time: when a transaction occurred (a date/timestamp).\n- transaction_key: groups line items into one transaction; high cardinality but recurring, and it strongly determines the event_time (see the dependencies).\n- entity_key: identifies an entity; set 'entity' to customer, product, location, or other.\n- additive_quantity: a count that sums meaningfully (integer-dominant; may be negative for returns).\n- monetary_rate: a per-unit price (decimal-bearing; NOT additive across a transaction).\n- monetary_amount: an extended amount, i.e. quantity times rate (additive).\n- discount: a reduction applied to an amount.\n- dimension: a categorical to slice by (country, category, ...).\n- flag: a boolean/indicator column.\n- description: free text describing an entity.\n- ignore: opaque notes/ids with no analytical role.\nGive a confidence in [0,1] and short evidence-grounded reasons. Every column gets exactly one claim.",
+    "prompt": "Assign a role to every column. Evidence (JSON):\n{\"row_count\":14,\"columns\":[{\"name\":\"order_id\",\"semantic_type\":\"integer\",\"null_rate\":0.0,\"distinct_count\":8,\"uniqueness_ratio\":0.5714285714285714,\"min_value\":\"1001\",\"max_value\":\"1008\",\"integer_ratio\":1.0,\"sign_mix\":{\"negatives\":0,\"zeros\":0,\"positives\":14},\"top_values\":[{\"value\":\"1001\",\"count\":2},{\"value\":\"1002\",\"count\":2},{\"value\":\"1003\",\"count\":2},{\"value\":\"1004\",\"count\":2},{\"value\":\"1005\",\"count\":2},{\"value\":\"1006\",\"count\":2},{\"value\":\"1007\",\"count\":1},{\"value\":\"1008\",\"count\":1}],\"samples\":[\"1001\",\"1002\",\"1003\",\"1004\",\"1005\"],\"determines\":[{\"other\":\"order_date\",\"strength\":1.0,\"support\":6}],\"determined_by\":[]},{\"name\":\"order_date\",\"semantic_type\":\"date\",\"null_rate\":0.0,\"distinct_count\":4,\"uniqueness_ratio\":0.2857142857142857,\"min_value\":\"2011-03-01\",\"max_value\":\"2011-03-04\",\"integer_ratio\":null,\"sign_mix\":null,\"top_values\":[{\"value\":\"2011-03-01\",\"count\":4},{\"value\":\"2011-03-02\",\"count\":4},{\"value\":\"2011-03-03\",\"count\":4},{\"value\":\"2011-03-04\",\"count\":2}],\"samples\":[\"2011-03-01\",\"2011-03-02\",\"2011-03-03\",\"2011-03-04\"],\"determines\":[],\"determined_by\":[{\"other\":\"order_id\",\"strength\":1.0,\"support\":6}]},{\"name\":\"product\",\"semantic_type\":\"text\",\"null_rate\":0.0,\"distinct_count\":3,\"uniqueness_ratio\":0.21428571428571427,\"min_value\":\"Gadget\",\"max_value\":\"Widget\",\"integer_ratio\":null,\"sign_mix\":null,\"top_values\":[{\"value\":\"Widget\",\"count\":6},{\"value\":\"Gadget\",\"count\":5},{\"value\":\"Gizmo\",\"count\":3}],\"samples\":[\"Gadget\",\"Gizmo\",\"Widget\"],\"determines\":[],\"determined_by\":[]},{\"name\":\"quantity\",\"semantic_type\":\"integer\",\"null_rate\":0.0,\"distinct_count\":10,\"uniqueness_ratio\":0.7142857142857143,\"min_value\":\"-2\",\"max_value\":\"10\",\"integer_ratio\":1.0,\"sign_mix\":{\"negatives\":1,\"zeros\":0,\"positives\":13},\"top_values\":[{\"value\":\"2\",\"count\":3},{\"value\":\"1\",\"count\":2},{\"value\":\"3\",\"count\":2},{\"value\":\"-2\",\"count\":1},{\"value\":\"10\",\"count\":1},{\"value\":\"4\",\"count\":1},{\"value\":\"5\",\"count\":1},{\"value\":\"6\",\"count\":1},{\"value\":\"7\",\"count\":1},{\"value\":\"8\",\"count\":1}],\"samples\":[\"-2\",\"1\",\"10\",\"2\",\"3\"],\"determines\":[],\"determined_by\":[]},{\"name\":\"unit_price\",\"semantic_type\":\"decimal\",\"null_rate\":0.0,\"distinct_count\":3,\"uniqueness_ratio\":0.21428571428571427,\"min_value\":\"2.5\",\"max_value\":\"9.0\",\"integer_ratio\":0.5714285714285714,\"sign_mix\":{\"negatives\":0,\"zeros\":0,\"positives\":14},\"top_values\":[{\"value\":\"2.5\",\"count\":6},{\"value\":\"9.0\",\"count\":5},{\"value\":\"4.0\",\"count\":3}],\"samples\":[\"2.5\",\"4.0\",\"9.0\"],\"determines\":[],\"determined_by\":[]},{\"name\":\"customer\",\"semantic_type\":\"text\",\"null_rate\":0.0,\"distinct_count\":5,\"uniqueness_ratio\":0.35714285714285715,\"min_value\":\"C1\",\"max_value\":\"C5\",\"integer_ratio\":null,\"sign_mix\":null,\"top_values\":[{\"value\":\"C1\",\"count\":4},{\"value\":\"C2\",\"count\":4},{\"value\":\"C3\",\"count\":2},{\"value\":\"C4\",\"count\":2},{\"value\":\"C5\",\"count\":2}],\"samples\":[\"C1\",\"C2\",\"C3\",\"C4\",\"C5\"],\"determines\":[],\"determined_by\":[]}]}",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "claims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "column": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "event_time",
+                  "transaction_key",
+                  "entity_key",
+                  "additive_quantity",
+                  "monetary_rate",
+                  "monetary_amount",
+                  "discount",
+                  "dimension",
+                  "flag",
+                  "description",
+                  "ignore"
+                ]
+              },
+              "entity": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "customer",
+                  "product",
+                  "location",
+                  "other",
+                  null
+                ]
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "column",
+              "role",
+              "confidence",
+              "reasons"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "claims"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "response": {
+    "claims": [
+      {
+        "column": "order_id",
+        "role": "transaction_key",
+        "entity": null,
+        "confidence": 0.95,
+        "reasons": [
+          "High cardinality (8 distinct / 14 rows) but recurring, not unique",
+          "Strongly determines order_date (strength 1.0, support 6)",
+          "Integer sequence 1001-1008 typical of transaction identifiers grouping line items"
+        ]
+      },
+      {
+        "column": "order_date",
+        "role": "event_time",
+        "entity": null,
+        "confidence": 0.98,
+        "reasons": [
+          "Semantic type is date",
+          "Determined by order_id with strength 1.0",
+          "Low uniqueness (0.29) consistent with multiple line items sharing transaction dates"
+        ]
+      },
+      {
+        "column": "product",
+        "role": "entity_key",
+        "entity": "product",
+        "confidence": 0.95,
+        "reasons": [
+          "Text values (Widget, Gadget, Gizmo) represent product entities",
+          "Low cardinality (3 distinct) typical of product catalog dimension",
+          "Name and content clearly identify product entities"
+        ]
+      },
+      {
+        "column": "quantity",
+        "role": "additive_quantity",
+        "entity": null,
+        "confidence": 0.95,
+        "reasons": [
+          "All integers (ratio 1.0), sums meaningfully across transactions",
+          "Contains negative value (-2), consistent with returns/adjustments",
+          "High variability (-2 to 10) typical of order line quantities"
+        ]
+      },
+      {
+        "column": "unit_price",
+        "role": "monetary_rate",
+        "entity": null,
+        "confidence": 0.95,
+        "reasons": [
+          "Decimal-bearing values (2.5, 4.0, 9.0) typical of per-unit pricing",
+          "Low cardinality (3 distinct) aligns with product count (price per product type)",
+          "NOT additive across transaction; requires multiplication with quantity for extended amount"
+        ]
+      },
+      {
+        "column": "customer",
+        "role": "entity_key",
+        "entity": "customer",
+        "confidence": 0.95,
+        "reasons": [
+          "Text identifiers (C1-C5) represent customer entities",
+          "Moderate cardinality (5 distinct) typical of customer dimension",
+          "Name and pattern clearly identify customer entities"
+        ]
+      }
+    ]
+  },
+  "recorded_by": "recorded (ambient)",
+  "recorded_model": "claude-sonnet-4-5",
+  "recorded_at": "2026-09-05"
+}
