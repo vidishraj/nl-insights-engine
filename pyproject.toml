@@ -1,0 +1,66 @@
+[project]
+name = "nl-insights"
+version = "0.1.0"
+description = "Natural-language insights over any transactional CSV: infer the schema, answer questions with no code changes."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    # HTTP API + ASGI server.
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    # Multipart parsing so `curl -F file=@x.csv` / browser file pickers upload correctly.
+    "python-multipart>=0.0.9",
+    # Embedded analytical engine — one DuckDB file per dataset.
+    "duckdb>=1.1",
+    # Typed models everywhere: config, profile, semantic model, query IR.
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+]
+
+# The LLM provider is pluggable. The default REPLAY path needs no SDK and no
+# credentials, so neither extra is required to run the system hermetically.
+[project.optional-dependencies]
+# API-key path: a grader with their own ANTHROPIC_API_KEY.
+apikey = ["anthropic>=0.39"]
+# Ambient path: Claude subscription auth via the agent SDK (our dev path).
+ambient = ["claude-agent-sdk>=0.1"]
+
+[project.scripts]
+nl-insights = "nl_insights.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "httpx>=0.27",          # FastAPI TestClient
+    "ruff>=0.7",            # lint + format
+    "mypy>=1.13",           # static typing
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nl_insights"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src"]
+
+# Optional provider SDKs are only present when their extra is installed; the replay
+# path and CI don't need them, so their imports (already lazy + guarded) are ignored.
+[[tool.mypy.overrides]]
+module = ["anthropic", "anthropic.*", "claude_agent_sdk", "claude_agent_sdk.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
