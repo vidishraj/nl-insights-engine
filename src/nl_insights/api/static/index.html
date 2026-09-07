@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>NL Insights — glass box</title>
+<style>
+  :root { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f8fafc; --card:#fff;
+          --ok:#16a34a; --bad:#b91c1c; --warn:#b45309; --accent:#4338ca; --code:#0b1021; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+         color:var(--ink); background:var(--bg); }
+  header { padding:14px 20px; background:var(--card); border-bottom:1px solid var(--line);
+           display:flex; align-items:baseline; gap:14px; }
+  header h1 { font-size:17px; margin:0; }
+  header .sub { color:var(--muted); font-size:12px; }
+  header .prov { margin-left:auto; font-size:12px; color:var(--muted); }
+  main { max-width:1100px; margin:0 auto; padding:18px 20px 60px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px;
+          padding:14px 16px; margin-bottom:16px; }
+  .card h2 { font-size:14px; margin:0 0 10px; letter-spacing:.02em; text-transform:uppercase; color:var(--muted); }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  input[type=text], input[type=file] { font:inherit; padding:7px 9px; border:1px solid var(--line);
+          border-radius:8px; background:#fff; }
+  input[type=text] { flex:1; min-width:240px; }
+  button { font:inherit; font-weight:600; padding:7px 14px; border:1px solid var(--accent);
+           background:var(--accent); color:#fff; border-radius:8px; cursor:pointer; }
+  button.ghost { background:#fff; color:var(--accent); }
+  button:disabled { opacity:.5; cursor:default; }
+  label.chk { font-size:13px; color:var(--muted); display:flex; gap:6px; align-items:center; }
+  table { border-collapse:collapse; width:100%; font-size:13px; }
+  th,td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-weight:600; }
+  code, pre { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+  pre.code { background:var(--code); color:#e2e8f0; padding:12px; border-radius:8px; overflow:auto; font-size:12px; }
+  .chip { display:inline-block; padding:1px 7px; border-radius:999px; font-size:11px; font-weight:700; }
+  .chip.ok { background:#dcfce7; color:var(--ok); }
+  .chip.bad { background:#fee2e2; color:var(--bad); }
+  .chip.mut { background:#f1f5f9; color:var(--muted); }
+  .chip.llm { background:#e0e7ff; color:var(--accent); }
+  .chip.heur { background:#fef3c7; color:var(--warn); }
+  .verdict { font-weight:800; padding:3px 10px; border-radius:8px; display:inline-block; }
+  .verdict.answer { background:#dcfce7; color:var(--ok); }
+  /* A caveated answer is honest disclosure, not a warning — green like a plain
+     answer, with a separate neutral "+ caveats" badge (see renderResult). */
+  .verdict.answer_with_caveats { background:#dcfce7; color:var(--ok); }
+  .verdict.refuse { background:#e0e7ff; color:var(--accent); }
+  .verdict.clarify { background:#e0e7ff; color:var(--accent); }
+  .bar { height:7px; background:#eef2ff; border-radius:6px; width:70px; display:inline-block; vertical-align:middle; }
+  .bar > i { display:block; height:100%; background:var(--accent); border-radius:6px; }
+  .muted { color:var(--muted); }
+  ul.tight { margin:6px 0; padding-left:18px; }
+  details > summary { cursor:pointer; color:var(--accent); font-size:12px; }
+  .hidden { display:none; }
+  .kv { display:grid; grid-template-columns:auto 1fr; gap:2px 12px; font-size:13px; }
+  .del { color:var(--bad); }
+  .ins { color:var(--ok); }
+
+  /* Pipeline status tree (stage checklist): shows where you are in a long
+     operation — pending / active / done / failed — with the live stage message.
+     Completed stages stay visible so you can see the whole path taken. */
+  .tree { list-style:none; margin:10px 0 0; padding:0; }
+  .tree li { display:flex; gap:9px; align-items:flex-start; padding:4px 0; }
+  .tree .ic { flex:none; width:16px; text-align:center; line-height:1.5; font-weight:700; }
+  .tree .ic.pending::before  { content:'\25CB'; color:#cbd5e1; }               /* ○ */
+  .tree .ic.active::before   { content:'\25D0'; color:var(--accent);           /* ◐ */
+                               display:inline-block; animation:spin 1s linear infinite; }
+  .tree .ic.done::before     { content:'\2713'; color:var(--ok); }             /* ✓ */
+  .tree .ic.failed::before   { content:'\2717'; color:var(--bad); }            /* ✗ */
+  .tree .ic.skipped::before  { content:'\00B7'; color:#cbd5e1; }               /* · */
+  .tree .body { display:flex; flex-direction:column; min-width:0; }
+  .tree .name { font-weight:600; text-transform:capitalize; }
+  .tree li.pending .name, .tree li.skipped .name { color:#94a3b8; font-weight:500; }
+  .tree li.failed .name { color:var(--bad); }
+  .tree .sub { color:var(--muted); font-size:12px; }
+  .tree li.active .sub { color:var(--ink); }
+  .tree li.failed .sub { color:var(--bad); }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .tree .ic.active::before { animation:none; } }
+
+  /* ---------- responsive (wb-wkn.37): mobile-first, no horizontal PAGE overflow.
+     The glass-box tables and code blocks must scroll within their OWN box (or
+     wrap) and never widen the page; long unbroken strings (column names, SQL,
+     formulas) wrap or scroll rather than push layout. Reasoned from explicit
+     widths at 375px; the phone is the definitive check. */
+  html, body { max-width: 100%; }
+  body { overflow-x: hidden; }          /* backstop: the page scrolls vertically only */
+  pre.code { max-width: 100%; }         /* code scrolls in its own box (overflow:auto set above) */
+  code { overflow-wrap: anywhere; }     /* inline column names / formulas wrap, don't push */
+  .kv { min-width: 0; }
+  .row > div { min-width: 0; }          /* flex children shrink so a child <pre> scrolls, not pushes */
+
+  @media (max-width: 640px) {
+    main { padding: 14px 12px 48px; }
+    .card { padding: 12px 12px; }
+    header { flex-wrap: wrap; gap: 6px 12px; }
+    header .prov { margin-left: 0; }
+    /* Wide data tables (model card, measures, answer rows) scroll horizontally
+       WITHIN the card rather than overflowing the page. Natural width + font
+       preserved (no shrink-to-fit); the box scrolls, the page does not. */
+    .card table {
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      white-space: nowrap;
+    }
+    /* Question box full width; the Ask button + checkbox drop beneath, not crushed. */
+    .row input[type=text] { flex: 1 1 100%; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>NL Insights — <span class="muted">glass box</span></h1>
+  <span class="sub">watch the model assemble · every answer shows its plan, SQL, and assumptions · refusals show the reason</span>
+  <span class="prov" id="prov">…</span>
+</header>
+<main>
+
+  <div class="card">
+    <h2>1 · Load a CSV</h2>
+    <div class="row">
+      <input type="file" id="file" accept=".csv,text/csv"/>
+      <input type="text" id="dsname" placeholder="dataset name (optional)" style="max-width:220px; flex:0 1 220px"/>
+      <button id="ingest">Ingest</button>
+      <span class="muted" id="ingestState"></span>
+    </div>
+    <ol class="tree hidden" id="ingestTree"></ol>
+  </div>
+
+  <div class="card hidden" id="modelCard">
+    <h2>2 · What the system understood <span id="modelMeta" class="muted"></span></h2>
+    <div id="model"></div>
+  </div>
+
+  <div class="card hidden" id="askCard">
+    <h2>3 · Ask a question</h2>
+    <div class="row">
+      <input type="text" id="q" placeholder="e.g. top products by revenue"/>
+      <label class="chk"><input type="checkbox" id="followup"/> as follow-up (show the IR diff)</label>
+      <button id="ask">Ask</button>
+    </div>
+    <ol class="tree hidden" id="askTree"></ol>
+    <div id="result"></div>
+  </div>
+
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let currentDataset = null, lastQueryJobId = null, lastIR = null;
+
+fetch('/health').then(r=>r.json()).then(h=>{ $('prov').textContent = 'provider: '+h.provider+' · model: '+h.model; });
+
+// Escape for BOTH text and attribute contexts — quotes included — so a value
+// like a column name lifted from an uploaded CSV header can never break out of an
+// attribute (e.g. title="…") and inject markup. This endpoint is public + unauthed.
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function chip(cls,txt){ return '<span class="chip '+cls+'">'+esc(txt)+'</span>'; }
+
+// The fixed pipeline stages, in order, with a static description of what each does.
+// The static text carries the thesis (the model PROPOSES, deterministic code CHECKS);
+// the live per-event message replaces it on the stage that is currently active.
+// Order matches the server's actual emit sequence (verified against a live
+// ingest): sniffing, loading, profiling, resolving_dates, inferring, verifying,
+// discovering, promoting. The live per-event message overrides these fallbacks.
+const INGEST_STAGES = [
+  ['sniffing',        'detecting the CSV dialect (delimiter, quote, header)'],
+  ['loading',         'loading rows into DuckDB with type inference'],
+  ['profiling',       'profiling types, cardinalities and dependencies'],
+  ['resolving_dates', 'resolving day/month order from the data'],
+  ['inferring',       'proposing column roles from the evidence (LLM proposes)'],
+  ['verifying',       'testing each claim against the data (code disposes)'],
+  ['discovering',     'discovering measures, partitions and labels'],
+  ['promoting',       'publishing the dataset atomically'],
+];
+const QUERY_STAGES = [
+  ['interpreting', 'the model proposes a typed plan (LLM proposes)'],
+  ['binding',      'deterministic code validates the plan against the semantic model'],
+  ['executing',    'running the validated SQL on DuckDB'],
+];
+
+// Render one tree row.
+function treeRow(st, name, sub){
+  return '<li class="'+st+'"><span class="ic '+st+'" aria-hidden="true"></span>'
+       + '<span class="body"><span class="name">'+esc(name)+'</span>'
+       + '<span class="sub">'+esc(sub||'')+'</span></span></li>';
+}
+
+// Render the stage tree. leadRows are client-side rows shown ABOVE the server
+// stages in the SAME tree (the upload phase, which SSE structurally can't cover)
+// so the whole journey — uploading -> sniffing -> … -> promoting — reads as one
+// continuous pipeline (wb-wkn.37). Each is {status, name, sub}.
+function renderTree(el, stages, status, msg, leadRows){
+  el.classList.remove('hidden');
+  let h='';
+  for(const r of (leadRows || [])) h += treeRow(r.status, r.name, r.sub);
+  for(const [key, desc] of stages){
+    const st = status[key] || 'pending';
+    const sub = (msg[key] != null && msg[key] !== '') ? msg[key] : desc;
+    h += treeRow(st, key.replace(/_/g,' '), sub);
+  }
+  el.innerHTML = h;
+}
+
+// Stream a job's stage events into a status tree; resolve with the terminal JobView.
+// The tree is keyed by stage name, so it is idempotent under SSE reconnect/replay
+// (the server replays history first) and correct even if buffering delivers every
+// event at once right before 'done' (we also reconstruct from the done frame's events).
+function streamJob(jobId, treeEl, stages, leadRows){
+  const order = stages.map(s=>s[0]);
+  const status = {}, msg = {};
+  order.forEach(k => status[k]='pending');
+  let active = null;
+  const paint = () => renderTree(treeEl, stages, status, msg, leadRows);
+  paint();
+
+  // Order-INDEPENDENT progress: when a stage becomes active, the previously
+  // active one is finished. This never marks a later stage done before an earlier
+  // one even if the emit order differs from the display order, and it tolerates
+  // gaps and duplicate/replayed events (a repeat of the active stage is a no-op).
+  function applyEvent(ev){
+    if(!ev || !ev.stage) return;
+    if(order.indexOf(ev.stage) >= 0){
+      if(active && active !== ev.stage && status[active] !== 'failed') status[active] = 'done';
+      if(status[ev.stage] !== 'failed'){ status[ev.stage] = 'active'; active = ev.stage; }
+    }
+    msg[ev.stage] = ev.message || '';
+  }
+
+  function finalize(view){
+    // Reconstruct from the authoritative event history in the done frame — so the
+    // full path shows even if live progress was buffered and never rendered live.
+    if(view && Array.isArray(view.events)) view.events.forEach(applyEvent);
+    const state = view ? view.state : null;
+    if(state === 'failed'){
+      const f = active || order[0];
+      status[f] = 'failed';
+      if(view.error) msg[f] = (view.error.code ? '['+view.error.code+'] ' : '') + (view.error.message || 'failed');
+      for(const k of order) if(status[k] === 'pending') status[k] = 'skipped';
+    } else if(state === 'cancelled'){
+      if(active) status[active] = 'skipped';
+      for(const k of order) if(status[k] === 'pending') status[k] = 'skipped';
+    } else { // succeeded (a REFUSE/CLARIFY verdict is a SUCCESS, not a failure)
+      for(const k of order){
+        if(status[k] === 'active') status[k] = 'done';
+        else if(status[k] === 'pending') status[k] = 'skipped';
+      }
+      const kind = view && view.result && view.result.kind;
+      if((kind === 'refuse' || kind === 'clarify') && status['executing'] === 'skipped'){
+        msg['executing'] = (kind === 'refuse')
+          ? 'not run — the plan was refused before any SQL'
+          : 'not run — a clarification is needed first';
+      }
+    }
+    active = null;
+    paint();
+  }
+
+  return new Promise((resolve)=>{
+    const es = new EventSource('/jobs/'+jobId+'/stream');
+    let settled = false, pollTimer = null;
+    const POLL_MS = 6000;
+    const done = (v) => { if(settled) return; settled = true; if(pollTimer) clearTimeout(pollTimer); es.close(); finalize(v); resolve(v); };
+
+    // Wall-clock watchdog — a safety net. A reverse proxy that BUFFERS SSE could
+    // hold the connection open WITHOUT erroring, so onerror never fires and 'done'
+    // never arrives; the tree would freeze half-lit and the button stay disabled
+    // forever. So poll GET /jobs/{id} on a timer regardless of onerror: hydrate the
+    // tree from the authoritative events[] and finalize once the job is terminal.
+    // Each live progress frame re-arms the timer, so a healthy stream never polls.
+    //
+    // STANDING (be precise — do not let this compress into "the watchdog is tested"):
+    //   - VERIFIED IN LOGIC: the reconstruction path (finalize from view.events[])
+    //     is asserted against real captured ingest/refusal payloads.
+    //   - DORMANT in the current deployment: nginx here does NOT freeze the stream
+    //     (the app flushes each SSE frame and frames are separated by long LLM idle
+    //     gaps, so nginx forwards each frame even with proxy_buffering on; gzip is
+    //     off and text/event-stream isn't gzipped). Confirmed by A/B capture.
+    //   - NOT exercised in production: nothing in this config makes it fire.
+    //   RETAINED for environments that WOULD need it: a proxy that holds the socket
+    //   open, event-stream getting gzipped, or a future non-flushing pipeline stage.
+    const poll = () => {
+      if(settled) return;
+      fetch('/jobs/'+jobId).then(r=>r.ok?r.json():null).then(v=>{
+        if(settled) return;
+        if(v){
+          if(Array.isArray(v.events)) v.events.forEach(applyEvent);
+          paint();
+          if(v.state==='succeeded' || v.state==='failed' || v.state==='cancelled'){ done(v); return; }
+        }
+        pollTimer = setTimeout(poll, POLL_MS);
+      }).catch(()=>{ if(!settled) pollTimer = setTimeout(poll, POLL_MS); });
+    };
+    const armPoll = () => { if(pollTimer) clearTimeout(pollTimer); pollTimer = setTimeout(poll, POLL_MS); };
+    armPoll();
+
+    es.addEventListener('progress', (e)=>{
+      let ev; try { ev = JSON.parse(e.data); } catch { return; }
+      applyEvent(ev);
+      paint();
+      armPoll(); // healthy stream keeps resetting the watchdog so it never fires
+    });
+    es.addEventListener('done', (e)=>{
+      let v = null; try { v = JSON.parse(e.data); } catch {}
+      done(v);
+    });
+    // SSE dropped: EventSource auto-reconnects and the server replays history (the
+    // tree re-hydrates idempotently). Note it, and let the wall-clock poll (nudged
+    // sooner here) reach a terminal state if the stream can't recover.
+    es.onerror = ()=>{
+      if(settled) return;
+      if(active){ msg[active] = (msg[active]||'') + ' · reconnecting…'; paint(); }
+      if(pollTimer) clearTimeout(pollTimer);
+      pollTimer = setTimeout(poll, 800);
+    };
+  });
+}
+
+function fmtBytes(n){
+  if(n == null) return '';
+  if(n < 1024) return n+' B';
+  if(n < 1048576) return (n/1024).toFixed(0)+' KB';
+  return (n/1048576).toFixed(1)+' MB';
+}
+// A human message for an upload that failed before any job/stage existed — incl.
+// 413 (over the 500 MB cap) and 507 (disk ceiling), which otherwise have no home
+// in the tree because they happen before the first SSE stage (wb-wkn.37).
+function uploadErrorMessage(status, body){
+  if(body && body.error && body.error.message) return body.error.message;
+  if(status === 413) return 'file too large — over the 500 MB upload limit';
+  if(status === 507) return 'server is out of disk space to store the upload';
+  if(status === 0)   return 'upload failed — the connection was interrupted';
+  return 'upload failed (HTTP '+status+')';
+}
+
+// POST the file with XMLHttpRequest (fetch cannot report upload progress) and
+// drive an "uploading" node as the FIRST row of the ingest tree: determinate
+// percentage while bytes transfer, ✓ when the server has the whole file, or ✗
+// with a shaped message on failure. Resolves {ok, job?, leadRows}. leadRows is
+// the finished upload row to keep visible above the server stages.
+function uploadWithProgress(url, file, treeEl, stages){
+  const status = {}, msg = {};
+  stages.forEach(([k]) => status[k]='pending');
+  const lead = { name:'uploading', status:'active', sub:'starting…' };
+  const paint = () => renderTree(treeEl, stages, status, msg, [lead]);
+  paint();
+  return new Promise((resolve) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url, true);
+    xhr.upload.onprogress = (e) => {
+      if(e.lengthComputable){
+        const pct = Math.min(100, Math.floor(e.loaded / e.total * 100));
+        lead.sub = pct+'% · '+fmtBytes(e.loaded)+' / '+fmtBytes(e.total);
+      } else {
+        // No Content-Length on the upload — show bytes sent, never NaN%.
+        lead.sub = 'uploading '+fmtBytes(e.loaded)+'…';
+      }
+      paint();
+    };
+    xhr.onload = () => {
+      let body = null; try { body = JSON.parse(xhr.responseText); } catch {}
+      if(xhr.status >= 200 && xhr.status < 300 && body && body.job_id){
+        lead.status = 'done';
+        lead.sub = 'file received' + (file.size ? (' · '+fmtBytes(file.size)) : '');
+        paint();
+        resolve({ ok:true, job: body, leadRows:[{ name:lead.name, status:'done', sub:lead.sub }] });
+      } else {
+        lead.status = 'failed';
+        const code = (body && body.error && body.error.code) || ('http_'+xhr.status);
+        lead.sub = '['+code+'] '+uploadErrorMessage(xhr.status, body);
+        paint();
+        resolve({ ok:false });
+      }
+    };
+    xhr.onerror = () => { lead.status='failed'; lead.sub='upload failed — network error or connection lost'; paint(); resolve({ ok:false }); };
+    xhr.ontimeout = () => { lead.status='failed'; lead.sub='upload timed out'; paint(); resolve({ ok:false }); };
+    const fd = new FormData(); fd.append('file', file);
+    xhr.send(fd);
+  });
+}
+
+$('ingest').onclick = async () => {
+  const f = $('file').files[0];
+  if(!f){ $('ingestState').textContent='choose a CSV first'; return; }
+  $('ingest').disabled = true; $('ingestState').textContent='uploading…';
+  const name = $('dsname').value.trim();
+  const url = '/datasets' + (name ? ('?name='+encodeURIComponent(name)) : '');
+  // Phase 1: browser -> server byte transfer, shown as the first tree node.
+  const up = await uploadWithProgress(url, f, $('ingestTree'), INGEST_STAGES);
+  if(!up.ok){ $('ingest').disabled = false; $('ingestState').textContent='upload failed'; return; }
+  const job = up.job;
+  // Phase 2: server pipeline over SSE, with the finished upload row kept above it.
+  $('ingestState').textContent='ingesting job '+job.job_id.slice(0,8)+'…';
+  const done = await streamJob(job.job_id, $('ingestTree'), INGEST_STAGES, up.leadRows);
+  $('ingest').disabled = false;
+  if(!done || done.state!=='succeeded'){ $('ingestState').textContent='failed: '+(done?.error?.message||'unknown'); return; }
+  $('ingestState').textContent='ready · dataset '+job.dataset_id;
+  currentDataset = job.dataset_id;
+  const model = await (await fetch('/datasets/'+currentDataset)).json();
+  renderModel(model);
+  $('askCard').classList.remove('hidden');
+};
+
+function confBar(c){ return '<span class="bar"><i style="width:'+Math.round((c||0)*100)+'%"></i></span> '+(c!=null?c.toFixed(2):''); }
+
+function renderModel(d){
+  $('modelCard').classList.remove('hidden');
+  $('modelMeta').textContent = '· '+d.row_count.toLocaleString()+' rows';
+  const m = d.model;
+  let html = '<table><thead><tr><th>column</th><th>role</th><th>entity</th><th>confidence</th><th>source</th><th>status</th><th>verifiers</th></tr></thead><tbody>';
+  for(const b of m.bindings){
+    const passed = (b.verifiers||[]).every(v=>v.passed);
+    const status = !(b.verifiers||[]).length ? chip('mut','unverified') : (passed?chip('ok','verified'):chip('bad','refuted'));
+    const vs = (b.verifiers||[]).map(v=> chip(v.passed?'ok':'bad', v.name)+' <span class="muted" title="'+esc(v.detail)+'">'+esc((v.detail||'').slice(0,54))+'</span>').join('<br>');
+    const src = b.provenance==='heuristic'?chip('heur','heuristic'):chip('llm','llm');
+    html += '<tr><td><code>'+esc(b.column)+'</code></td><td>'+esc(b.role)+'</td><td>'+esc(b.entity||'')+'</td><td>'+confBar(b.confidence)+'</td><td>'+src+'</td><td>'+status+'</td><td>'+(vs||'<span class="muted">—</span>')+'</td></tr>';
+  }
+  html += '</tbody></table>';
+
+  html += '<div class="kv" style="margin-top:12px">';
+  html += '<div class="muted">returns</div><div>'+esc(m.returns.kind)+(m.returns.column?(' via <code>'+esc(m.returns.column)+'</code>'):'')+'</div>';
+  if(m.partition_dimensions?.length) html += '<div class="muted">partition</div><div>'+m.partition_dimensions.map(p=>'<code>'+esc(p.column)+'</code>'+(p.fact_value?(' = '+esc(p.fact_value)):' (no single fact value)')).join(', ')+'</div>';
+  if(m.labels?.length) html += '<div class="muted">labels</div><div>'+m.labels.map(l=>'<code>'+esc(l.column)+'</code> → <code>'+esc(l.entity_column)+'</code> ('+esc(l.entity||'?')+')').join(', ')+'</div>';
+  if(m.period_completeness?.length) html += '<div class="muted">period completeness</div><div>'+m.period_completeness.map(p=>'<code>'+esc(p.flag_column)+'</code>').join(', ')+'</div>';
+  html += '</div>';
+
+  html += '<h2 style="margin-top:14px">measures</h2><table><thead><tr><th>measure</th><th>available</th><th>expression</th><th>sql</th></tr></thead><tbody>';
+  for(const me of m.measures){
+    html += '<tr><td><code>'+esc(me.name)+'</code></td><td>'+(me.available?chip('ok','yes'):chip('mut','no'))+'</td><td class="muted">'+esc(me.expression)+'</td><td><code>'+esc(me.sql||'—')+'</code></td></tr>';
+  }
+  html += '</tbody></table>';
+  $('model').innerHTML = html;
+}
+
+$('ask').onclick = async () => {
+  if(!currentDataset) return;
+  const q = $('q').value.trim(); if(!q) return;
+  $('ask').disabled = true; $('result').innerHTML='';
+  const body = { question:q };
+  if($('followup').checked && lastQueryJobId) body.previous_job_id = lastQueryJobId;
+  const res = await fetch('/datasets/'+currentDataset+'/query', {
+    method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(body) });
+  const job = await res.json();
+  if(!res.ok){ $('result').innerHTML = '<p class="del">error: '+esc(job.error?.message||res.status)+'</p>'; $('ask').disabled=false; return; }
+  const done = await streamJob(job.job_id, $('askTree'), QUERY_STAGES);
+  $('ask').disabled = false;
+  if(!done){ $('result').innerHTML='<p class="del">stream failed</p>'; return; }
+  if(done.state!=='succeeded'){ $('result').innerHTML='<p class="del">'+esc(done.error?.code||'failed')+': '+esc(done.error?.message||'')+'</p>'; return; }
+  lastQueryJobId = job.job_id;
+  renderResult(done.result);
+};
+
+function renderResult(r){
+  const kind = r.kind;
+  const label = (kind==='refuse') ? 'refused — by design'
+              : (kind==='clarify') ? 'needs clarification'
+              : (kind==='answer_with_caveats') ? 'answer'
+              : kind.replace(/_/g,' ');
+  // Caveats are disclosure, not a warning: a neutral badge, not an amber verdict.
+  const badge = (kind==='answer_with_caveats') ? ' <span class="chip mut">+ caveats</span>' : '';
+  let html = '<div style="margin:12px 0"><span class="verdict '+kind+'">'+esc(label)+'</span>'+badge+'</div>';
+
+  if(kind==='refuse'){
+    html += '<p class="muted">The system declined to answer — a deliberate, honest outcome rather than a guess.</p>';
+    html += '<p><b>Reason:</b> '+esc(r.reason||'')+'</p>';
+    html += '<details open><summary>evidence</summary><pre class="code">'+esc(JSON.stringify(r.evidence,null,2))+'</pre></details>';
+  } else if(kind==='clarify'){
+    html += '<p class="muted">The system needs one thing pinned down before it will answer.</p>';
+    html += '<p><b>'+esc(r.clarify_question||'Please clarify')+'</b></p>';
+    if(r.options?.length) html += '<ul class="tight">'+r.options.map(o=>'<li>'+esc(o)+'</li>').join('')+'</ul>';
+  } else if(r.answer){
+    const a = r.answer;
+    html += '<p>'+esc(a.explanation)+'</p>';
+    if(a.formula?.length) html += '<div class="kv"><div class="muted">formula</div><div>'+a.formula.map(f=>'<code>'+esc(f)+'</code>').join('<br>')+'</div></div>';
+    if(a.assumptions?.length) html += '<p><b>Assumptions</b></p><ul class="tight">'+a.assumptions.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+    if(a.caveats?.length) html += '<p><b>Caveats</b></p><ul class="tight">'+a.caveats.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+    if(a.coverage && Object.keys(a.coverage).length) html += '<div class="kv"><div class="muted">coverage</div><div>'+Object.entries(a.coverage).map(([k,v])=>'<code>'+esc(k)+'</code> '+(v*100).toFixed(1)+'%').join(', ')+'</div></div>';
+    html += renderRows(a.rows, a.columns);
+    html += '<details><summary>SQL</summary><pre class="code">'+esc(a.sql)+'</pre></details>';
+    html += '<details><summary>plan (validated IR)</summary><pre class="code">'+esc(JSON.stringify(a.plan?.ir ?? r.ir,null,2))+'</pre></details>';
+  }
+
+  // follow-up IR diff: what was inherited vs overridden (the merge notes carry this)
+  if(r.ir){
+    const notes = (r.ir.notes||[]).filter(n=>/merged follow-up|clarification/i.test(n));
+    if(notes.length){
+      html += '<details open><summary>follow-up: IR diff</summary><ul class="tight">'+
+        notes.map(n=>'<li>'+esc(n)+'</li>').join('') + '</ul>';
+      if(lastIR) html += '<div class="row" style="align-items:flex-start"><div><div class="muted">previous</div><pre class="code">'+esc(JSON.stringify(prune(lastIR),null,2))+'</pre></div><div><div class="muted">merged</div><pre class="code">'+esc(JSON.stringify(prune(r.ir),null,2))+'</pre></div></div>';
+      html += '</details>';
+    }
+  }
+  lastIR = r.ir || lastIR;
+  $('result').innerHTML = html;
+}
+
+function prune(ir){ const o={}; for(const [k,v] of Object.entries(ir||{})){
+  if(v==null) continue; if(Array.isArray(v)&&!v.length) continue; if(k==='notes'||k==='intent') continue; o[k]=v; } return o; }
+
+function renderRows(rows, cols){
+  if(!rows || !rows.length) return '<p class="muted">no rows</p>';
+  const columns = cols && cols.length ? cols : Object.keys(rows[0]);
+  let h = '<table><thead><tr>'+columns.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>';
+  for(const row of rows.slice(0,50)){
+    h += '<tr>'+columns.map(c=>{ let v=row[c]; if(typeof v==='number') v=Number.isInteger(v)?v:v.toFixed(2); return '<td>'+esc(v==null?'':v)+'</td>'; }).join('')+'</tr>';
+  }
+  h += '</tbody></table>';
+  if(rows.length>50) h += '<p class="muted">'+(rows.length-50)+' more rows…</p>';
+  return h;
+}
+</script>
+</body>
+</html>
