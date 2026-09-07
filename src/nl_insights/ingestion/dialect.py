@@ -20,6 +20,14 @@ class DialectError(ValueError):
     """Raised when the CSV dialect cannot be determined with confidence."""
 
 
+def caller_label(display_name: str | None) -> str:
+    """The name to show a CLIENT for the file under inspection. A shaped error must never
+    disclose the server path or the internal content-hash filename (they leak the data-store
+    layout); reference the user's own filename, or a neutral phrase when we were handed none.
+    The real server path belongs in the operator log, not the API response."""
+    return display_name or "the uploaded file"
+
+
 def _last_record_boundary(text: str, quotechar: str) -> int:
     """Index of the last newline that ends a COMPLETE record — a newline that falls OUTSIDE a
     quoted field. A multi-line quoted field contains newlines that are NOT record boundaries;
@@ -67,10 +75,11 @@ def _detect_encoding(raw: bytes) -> str:
         return "cp1252"
 
 
-def sniff_dialect(path: Path) -> Dialect:
+def sniff_dialect(path: Path, *, display_name: str | None = None) -> Dialect:
+    label = caller_label(display_name)
     raw = path.read_bytes()[:_SAMPLE_BYTES]
     if not raw.strip():
-        raise DialectError(f"{path} is empty or whitespace-only.")
+        raise DialectError(f"{label} is empty or whitespace-only.")
 
     encoding = _detect_encoding(raw)
     text = raw.decode(encoding, errors="replace")
@@ -83,7 +92,7 @@ def sniff_dialect(path: Path) -> Dialect:
         dialect = csv.Sniffer().sniff(text, delimiters=",;\t|")
     except csv.Error as exc:
         raise DialectError(
-            f"Could not determine the delimiter for {path}: {exc}. "
+            f"Could not determine the delimiter for {label}: {exc}. "
             f"Supported delimiters are comma, semicolon, tab, and pipe."
         ) from exc
 
@@ -108,14 +117,14 @@ def sniff_dialect(path: Path) -> Dialect:
         reader = csv.reader(io.StringIO(check_text), delimiter=delimiter, quotechar=quotechar)
         rows = [r for r in reader if r]
         if not rows:
-            raise DialectError(f"No parseable rows in {path} with delimiter {delimiter!r}.")
+            raise DialectError(f"No parseable rows in {label} with delimiter {delimiter!r}.")
         width = len(rows[0])
         for i, row in enumerate(rows[1:], start=2):
             if len(row) != width:
                 # State the fact (ragged), not an unestablished cause. It MAY be a mis-detected
                 # delimiter or quoting; do not assert one we have not confirmed.
                 raise DialectError(
-                    f"{path} is ragged near line {i}: expected {width} fields, got {len(row)} "
+                    f"{label} is ragged near line {i}: expected {width} fields, got {len(row)} "
                     f"with delimiter {delimiter!r} and quote {quotechar!r} — the delimiter or "
                     "quoting may be mis-detected."
                 )

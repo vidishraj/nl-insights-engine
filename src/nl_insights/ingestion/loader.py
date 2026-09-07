@@ -17,7 +17,7 @@ from pathlib import Path
 import duckdb
 
 from .dates import DateOrder, DateResolution, resolve_date_order
-from .dialect import Dialect, sniff_dialect
+from .dialect import Dialect, caller_label, sniff_dialect
 from .profile import Profile, compute_profile
 
 # Sample broadly (reservoir), not the head: a date-sorted file hides the
@@ -80,6 +80,14 @@ def _duckdb_encoding(sniffed: str) -> str:
     return _DUCKDB_ENCODING.get(sniffed, sniffed)
 
 
+def _scrub_source_path(text: str, source: Path, label: str) -> str:
+    """Strip the server-side source path and its internal content-hash filename from a message
+    bound for the caller, substituting the user's own filename. DuckDB's parser errors embed the
+    absolute path it read (e.g. 'CSV Error ... in file "/data/.../.uploads/<hash>.csv"'); the
+    caller must never see the data-store layout, so we replace the exact known strings."""
+    return text.replace(str(source), label).replace(source.name, label)
+
+
 def ingest(
     source: Path,
     *,
@@ -87,16 +95,20 @@ def ingest(
     name: str | None = None,
     table: str = "dataset",
     on_stage: StageFn | None = None,
+    display_name: str | None = None,
 ) -> IngestResult:
     # on_stage narrates each internal step (and may raise to abort — the job layer uses
     # it for stage-boundary cancellation). Called BEFORE each step, so a caller sees
     # "sniffing" while sniffing happens, not after.
+    # display_name is the user's ORIGINAL filename; every caller-facing error names it (or a
+    # neutral phrase) rather than the server path or the internal content-hash we stored under.
     emit = on_stage or _noop
+    label = caller_label(display_name)
     if not source.exists():
-        raise IngestionError(f"No such file: {source.name}")
+        raise IngestionError(f"No such file: {label}")
 
     emit("sniffing", "detecting delimiter, quote and header")
-    dialect = sniff_dialect(source)
+    dialect = sniff_dialect(source, display_name=display_name)
     dataset_id = _dataset_id(source, name)
     data_dir.mkdir(parents=True, exist_ok=True)
     duckdb_path = data_dir / f"{dataset_id}.duckdb"
@@ -139,9 +151,11 @@ def ingest(
                 last_exc = exc
         if last_exc is not None:
             # Keep the parser's diagnosis (e.g. 'ragged near line 2') but never the
-            # server-side absolute path — only the uploaded file's basename.
+            # server-side absolute path or internal hash: scrub them out of DuckDB's own
+            # message, which embeds the path it read, and name the user's file instead.
             raise IngestionError(
-                f"could not load {source.name} as a CSV: {last_exc}"
+                f"could not load {label} as a CSV: "
+                f"{_scrub_source_path(str(last_exc), source, label)}"
             ) from last_exc
 
         emit("profiling", "profiling types, cardinalities and functional dependencies")
@@ -149,7 +163,7 @@ def ingest(
         if profile.row_count == 0:
             # A header-only file loads "successfully" with zero rows; refuse by name
             # rather than let downstream produce confident answers over nothing.
-            raise IngestionError(f"{source.name} has a header but no data rows — nothing to query.")
+            raise IngestionError(f"{label} has a header but no data rows — nothing to query.")
         # Resolve date order from the ORIGINAL file strings (a DuckDB DATE column has
         # been normalised to ISO, erasing the day/month order we need), sampled
         # broadly so a date-sorted file still yields its disambiguating value.
