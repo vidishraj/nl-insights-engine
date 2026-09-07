@@ -115,8 +115,23 @@ def execute(
     # returns one row of zeros, which must not read as a confident 0. A cheap EXISTS over the
     # SAME filters tells us whether any row matched. (Grouped queries surface this as an empty
     # result set already; basket/frequency are different shapes.)
+    # A pure COUNT aggregation is exempt: 'how many X in 1999' = 0 is the TRUE count when
+    # nothing matched, not a false zero. Only sum/avg (and revenue) turn an empty match into an
+    # ambiguous zero that must be caveated.
+    count_only = (
+        bool(plan.ir.aggregations)
+        and all(a.func == "count" for a in plan.ir.aggregations)
+        and not plan.ir.measures
+        and not plan.ir.distinct_count_of
+    )
     no_rows_matched = False
-    if not plan.group_by and not plan.ir.basket and not plan.ir.frequency and not period_comparison:
+    if (
+        not plan.group_by
+        and not plan.ir.basket
+        and not plan.ir.frequency
+        and not period_comparison
+        and not count_only
+    ):
         where = _where(plan, et)
         if where:  # only meaningful when the query actually filters
             hit = con.execute(
