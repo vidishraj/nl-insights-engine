@@ -63,7 +63,12 @@ class AblationResult(BaseModel):
     case: str
     dropped_column: str
     refused: bool  # did the verdict correctly flip away from 'answer'?
-    verdict: str
+    # The COARSE outcome (answer / refuse / clarify) - all ablation measures, and all it CAN
+    # measure: it binds without executing, so there is no finished answer to earn a fine-grained
+    # ANSWERABLE vs ANSWER_WITH_CAVEATS class (that class is finalised only post-execute, by
+    # Answer.verdict_kind()). Reporting the bind-time fine-grained class here would put a second,
+    # provisional class into a report - exactly the drift we are closing everywhere else.
+    outcome: str
     reason: str = ""
 
 
@@ -97,7 +102,7 @@ def run_ablation(
                     case=case.name,
                     dropped_column=col,
                     refused=classify(verdict.kind) is not Expected.ANSWER,
-                    verdict=verdict.kind.value,
+                    outcome=classify(verdict.kind).value,
                     reason=verdict.reason or "",
                 )
             )

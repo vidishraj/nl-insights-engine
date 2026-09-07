@@ -16,10 +16,35 @@ exactly one verdict, with five refusal classes each behind a deterministic detec
 
 from __future__ import annotations
 
-from ..interpreter.ir import Aggregation, CategoricalFilter, QueryIR, TimeWindow
+from ..interpreter.ir import (
+    Aggregation,
+    CategoricalFilter,
+    Grain,
+    QueryIR,
+    TimeWindow,
+    named_period_grain,
+)
 from ..semantic.model import SemanticModel
 from ..semantic.ontology import EntityKind, Role
 from .verdict import BoundMeasure, BoundPlan, Caveat, Verdict, VerdictKind
+
+# Coarseness order, so a grain can be compared to a named period's granularity.
+_GRAIN_RANK = {"day": 0, "week": 1, "month": 2, "quarter": 3, "year": 4}
+
+
+def _time_group_grain(ir: QueryIR, model: SemanticModel) -> Grain | None:
+    """A grain becomes a GROUP BY - a per-period breakdown - when event_time is bound, UNLESS the
+    window is a single named period of that same (or coarser) granularity, which is one bucket by
+    definition. This reads what the fields mean: a named_period is a single bucket, a grain over a
+    range or with no bound is a breakdown; range and last_n bounds apply as filters ON TOP of the
+    grouping, they do not suppress it. A grain finer than the named period still groups within it.
+    """
+    if not (ir.time and ir.time.grain) or model.first_in_role(Role.EVENT_TIME) is None:
+        return None
+    npg = named_period_grain(ir.time.named_period)
+    if npg is not None and _GRAIN_RANK[ir.time.grain] >= _GRAIN_RANK[npg]:
+        return None  # the grain is the named period's own bucket (or coarser): a total
+    return ir.time.grain
 
 _COVERAGE_FLOOR = 0.98
 _AGG_FUNCS = frozenset({"count", "sum", "avg", "min", "max"})
@@ -475,8 +500,16 @@ def bind(model: SemanticModel, ir: QueryIR) -> Verdict:
         group_by=ir.group_by,
         applied_filters=applied_filters,
         require_complete_period_flag=require_complete,
+        time_group_grain=_time_group_grain(ir, model),
         coverage=model.coverage,
     )
 
-    kind = VerdictKind.ANSWER_WITH_CAVEATS if caveats else VerdictKind.ANSWERABLE
+    # On the answerable path the ANSWERABLE vs ANSWER_WITH_CAVEATS split is PROVISIONAL: it is
+    # finalised from the finished answer by Answer.verdict_kind(), because a caveat can be born at
+    # execute time (the non-fact partition disclosure) and this bind-time view cannot see it. Do
+    # NOT serialise this kind for an answered query - the pipeline replaces it post-execute. It is
+    # kept as an honest first read (based on the binder's own caveats: a fact partition, an
+    # excluded period, low coverage; assumptions never make an answer 'with caveats').
+    has_real_caveat = any(c.kind != "assumption" for c in caveats)
+    kind = VerdictKind.ANSWER_WITH_CAVEATS if has_real_caveat else VerdictKind.ANSWERABLE
     return Verdict(kind=kind, plan=plan, caveats=caveats)

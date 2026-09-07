@@ -112,6 +112,11 @@ def test_ingest_stream_and_query_end_to_end(tmp_path: Path) -> None:
         assert "binding" in qstream.text  # the plan passed the binder
         result = client.get(f"/jobs/{qid}").json()["result"]
         assert result["kind"] in {"answerable", "answer_with_caveats"}
+        # ONE finalised class, read by every consumer: the class the payload reports is exactly
+        # the one its own caveats imply. A bind-time kind out of step with the answer's caveats
+        # would show up right here as a mismatch.
+        expected = "answer_with_caveats" if result["answer"]["caveats"] else "answerable"
+        assert result["kind"] == expected
         assert result["answer"]["rows"]
 
 
@@ -154,6 +159,8 @@ def test_dataset_survives_a_restart_and_still_answers(tmp_path: Path) -> None:
         restarted.get(f"/jobs/{qid}/stream")  # await
         result = restarted.get(f"/jobs/{qid}").json()["result"]
         assert result["kind"] in {"answerable", "answer_with_caveats"}
+        expected = "answer_with_caveats" if result["answer"]["caveats"] else "answerable"
+        assert result["kind"] == expected  # the payload's class matches its own caveats
         assert result["answer"]["rows"]  # a real SQL answer over the persisted DuckDB file
 
 

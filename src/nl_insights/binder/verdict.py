@@ -13,7 +13,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from ..interpreter.ir import CategoricalFilter, QueryIR
+from ..interpreter.ir import CategoricalFilter, Grain, QueryIR
 
 
 class VerdictKind(StrEnum):
@@ -43,6 +43,10 @@ class BoundPlan(BaseModel):
     group_by: list[str]
     applied_filters: list[CategoricalFilter] = Field(default_factory=list)  # binder defaults
     require_complete_period_flag: str | None = None  # exclude incomplete periods
+    # Group the answer by a time grain (month/quarter/...): a period label is added to the
+    # SELECT/GROUP BY/ORDER BY. Set by the binder when the IR carries a grain that is a
+    # grouping (any grain with a bound event_time, unless the window is a single named period).
+    time_group_grain: Grain | None = None
     coverage: dict[str, float] = Field(default_factory=dict)
 
 

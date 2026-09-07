@@ -228,7 +228,14 @@ def run_query(
             )
         finally:
             con.close()
-        return QueryResult(dataset_id=dataset.dataset_id, kind=verdict.kind, answer=answer, ir=ir)
+        # The verdict CLASS is finalised from the FINISHED answer, never the bind-time kind: the
+        # answer carries caveats (e.g. a non-fact partition disclosure) that only exist after
+        # execute, and Answer.verdict_kind() is the one place that class is decided. Every consumer
+        # of this job reads QueryResult.kind, so this is the single class the payload, the SSE done
+        # event and the API all report.
+        return QueryResult(
+            dataset_id=dataset.dataset_id, kind=answer.verdict_kind(), answer=answer, ir=ir
+        )
     except Cancelled:
         raise
     except ReplayCacheMiss as exc:

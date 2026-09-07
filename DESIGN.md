@@ -160,7 +160,7 @@ completeness.
 
 Two design responses make these honest rather than silent: measures **refuse** when
 their roles don't bind (better a refusal than a wrong number), and answerable-but-scoped
-results **disclose and quantify** their assumptions (net-of-returns; and exactly how much
+results **disclose and quantify** their assumptions and caveats (net-of-returns; and exactly how much
 non-product money a bare total contains). Against the committed synthetic slice the bare `net_revenue` disclosure reads, verbatim from the code:
 
 > includes 6 non-PRODUCT line_type value(s) totalling +59,256.00 (POSTAGE +60,000.00, FEE -480.00, CARRIAGE +360.00, +3 more); restrict to line_type = PRODUCT to exclude them

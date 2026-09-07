@@ -185,11 +185,16 @@ def execute(
 
     measure_expr = {mb.name: mb.expression for mb in model.measures}
     assumptions = [c.detail for c in caveats if c.kind == "assumption"]
-    if disclosure is not None:
-        assumptions.append(disclosure.detail)
     other_caveats = [c.detail for c in caveats if c.kind != "assumption"] + [
         c.detail for c in degen
     ]
+    # Route the non-fact disclosure by its OWN kind, exactly like every binder caveat above. It is
+    # now a 'partition' caveat (a limitation of the number, not an interpretation), so it belongs
+    # with the caveats rather than the assumptions where it used to be hardcoded.
+    if disclosure is not None:
+        (assumptions if disclosure.kind == "assumption" else other_caveats).append(
+            disclosure.detail
+        )
     if window_disclosure is not None:
         other_caveats.append(window_disclosure.detail)
     # Basket: state what pair_count means and what is in scope, so the number is not read as
@@ -636,7 +641,10 @@ def _disclose_non_fact_rows(
         "to exclude them"
     )
     return Caveat(
-        kind="assumption",
+        # A limitation of THIS answer, not an interpretation of the question: the total is
+        # contaminated by non-fact money the user did not ask for and cannot rephrase away. It is
+        # the fact partition going un-applied, which is exactly what the 'partition' kind names.
+        kind="partition",
         detail=detail,
         metrics={"non_fact_total": round(total, 2), "non_fact_values": float(len(rows))},
     )
@@ -663,8 +671,19 @@ def _describe_filters(plan: BoundPlan, event_time: str | None) -> list[str]:
         out.append(_readable_categorical(cf) + "  [default: fact partition]")
     for nf in plan.ir.numeric_filters:
         out.append(_readable_numeric(nf))
-    if plan.ir.time and event_time:
-        out.append(f"time on {event_time}: {plan.ir.time.model_dump(exclude_none=True)}")
+    # Only report a time filter when a bound ACTUALLY constrains the rows. A bare grain carries
+    # no bound - it is a grouping, compiled as a period column, not a filter - so an empty window
+    # must not be announced as one (it would claim we narrowed the data when we did not).
+    if plan.ir.time and event_time and _time(plan.ir.time, event_time, plan.table):
+        win = plan.ir.time
+        if win.named_period:
+            out.append(f"time on {event_time}: {win.named_period}")
+        elif win.last_n and win.grain:
+            out.append(f"time on {event_time}: last {win.last_n} {win.grain}")
+        else:
+            bounds = [b for b in (f">= {win.start}" if win.start else "",
+                                  f"< {win.end}" if win.end else "") if b]
+            out.append(f"time on {event_time}: " + " ".join(bounds))
     if plan.require_complete_period_flag:
         out.append(f"only complete periods ({plan.require_complete_period_flag})  [default]")
     return out

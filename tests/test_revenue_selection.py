@@ -95,7 +95,10 @@ def test_single_unverified_amount_answers_with_prose_disclosure(tmp_path: Path) 
         },
     )
     v = bind(model, QueryIR(measures=["net_revenue"]))
-    assert v.kind is VerdictKind.ANSWER_WITH_CAVEATS
+    # ANSWERABLE, not ANSWER_WITH_CAVEATS: the only disclosure here is an ASSUMPTION (how we read
+    # the amount - "as reported", unverified), not a caveat that limits the answer. The prose
+    # still surfaces below; the verdict class is reserved for a real limitation.
+    assert v.kind is VerdictKind.ANSWERABLE
     a = execute(con, v.plan, model, v.caveats)
     assert a.rows[0]["net_revenue"] == con.execute(f"SELECT sum(total_bill) FROM {t}").fetchone()[0]
     disclosure = next(c for c in a.assumptions if "as reported" in c.lower())

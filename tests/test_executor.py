@@ -96,10 +96,12 @@ def _partitioned(tmp_path: Path):  # type: ignore[no-untyped-def]
 def test_bare_total_quantifies_included_non_product_rows(tmp_path: Path) -> None:
     con, model = _partitioned(tmp_path)
     a = _answer(con, model, QueryIR(measures=["net_revenue"]))
-    # postage = 3 lines × qty 2 × price 1000 = 6000 — the largest non-product component.
-    disclosure = next(a for a in a.assumptions if "non-PRODUCT" in a)
+    # postage = 3 lines × qty 2 × price 1000 = 6000 — the largest non-product component. The
+    # disclosure is a CAVEAT (the total is contaminated by non-product money), not an assumption.
+    disclosure = next(c for c in a.caveats if "non-PRODUCT" in c)
     assert "POSTAGE" in disclosure and "+6,000.00" in disclosure
     assert "restrict to line_kind = PRODUCT to exclude them" in disclosure
+    assert not any("non-PRODUCT" in c for c in a.assumptions)  # not in assumptions
 
 
 def test_ranking_products_does_not_disclose_non_product_rows(tmp_path: Path) -> None:
@@ -108,7 +110,7 @@ def test_ranking_products_does_not_disclose_non_product_rows(tmp_path: Path) -> 
     # disclose — a disclosure that fires when non-product rows are already excluded is
     # its own defect.
     a = _answer(con, model, QueryIR(measures=["net_revenue"], group_by=["description"]))
-    assert not any("non-PRODUCT" in c for c in a.assumptions)
+    assert not any("non-PRODUCT" in c for c in [*a.assumptions, *a.caveats])
 
 
 def test_no_partition_means_no_disclosure(tmp_path: Path) -> None:
@@ -116,7 +118,7 @@ def test_no_partition_means_no_disclosure(tmp_path: Path) -> None:
     # must NOT invent a disclosure.
     con, model = _built(tmp_path)
     a = _answer(con, model, QueryIR(measures=["net_revenue"]))
-    assert not any("non-" in c and "value(s)" in c for c in a.assumptions)
+    assert not any("non-" in c and "value(s)" in c for c in [*a.assumptions, *a.caveats])
 
 
 def test_top_group_with_topk(tmp_path: Path) -> None:
@@ -302,7 +304,7 @@ def test_enriched_bare_total_quantifies_the_non_product_money(tmp_path: Path) ->
     for gb in ([], ["country"]):  # bare total AND non-product grouping both disclose
         v = bind(model, QueryIR(measures=["net_revenue"], group_by=gb))
         a = execute(con, v.plan, model, v.caveats)
-        disclosure = next(x for x in a.assumptions if "non-PRODUCT" in x)
+        disclosure = next(x for x in a.caveats if "non-PRODUCT" in x)
         assert "POSTAGE +249,878.64" in disclosure
         assert "FEE -199,288.18" in disclosure
         assert "line_type = PRODUCT to exclude them" in disclosure

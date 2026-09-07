@@ -136,7 +136,7 @@ def test_metamorphic_ablation_flips_answers_to_refusals(tmp_path: Path) -> None:
     # every (answerable case, supporting column) pair must refuse once the column is gone
     assert results  # generated automatically — dozens of proofs for free at scale
     for r in results:
-        assert r.refused, f"{r.case} still answered after dropping {r.dropped_column}: {r.verdict}"
+        assert r.refused, f"{r.case} still answered after dropping {r.dropped_column}: {r.outcome}"
 
 
 def test_binder_mutation_makes_the_suite_go_red(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]

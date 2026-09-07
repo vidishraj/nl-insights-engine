@@ -21,9 +21,12 @@ import duckdb
 from pydantic import BaseModel
 
 from ..binder import VerdictKind, bind
-from ..executor import execute
-from ..interpreter.ir import QueryIR
+from ..executor import Answer, execute
+from ..interpreter.ir import QueryIR, named_period_grain
 from ..semantic.model import SemanticModel
+
+# Coarseness order, so a requested grain can be compared to a named period's granularity.
+_GRAIN_RANK = {"day": 0, "week": 1, "month": 2, "quarter": 3, "year": 4}
 
 
 class Expected(StrEnum):
@@ -74,15 +77,76 @@ class SuiteReport(BaseModel):
         return all(r.passed for r in self.results)
 
 
+def _time_grain_honored(answer: Answer) -> bool:
+    """A requested time grain is honored two ways only: it became a compiled per-period grouping
+    (plan.time_group_grain is set), or it collapsed into a single named period of that same or
+    coarser granularity, which is one bucket by definition. Anything else is a dropped grain."""
+    ir = answer.plan.ir
+    if answer.plan.time_group_grain is not None:
+        return True
+    if not (ir.time and ir.time.grain):
+        return True  # no grain was requested; nothing to honor
+    npg = named_period_grain(ir.time.named_period)
+    return npg is not None and _GRAIN_RANK[ir.time.grain] >= _GRAIN_RANK[npg]
+
+
+def coherence_violations(kind: VerdictKind, answer: Answer) -> list[str]:
+    """Internal-coherence invariants EVERY produced answer must satisfy, independent of dataset
+    or question - the checks a verdict-class assertion cannot make, and which constrain answers
+    nobody has written a case for yet:
+
+      1. an ANSWER_WITH_CAVEATS verdict must disclose an actual CAVEAT. A caveat says what is
+         limited about THIS answer; an assumption only says how we read the data (dates are
+         day-first), and almost every answer carries one. Accepting an assumption as disclosure
+         makes this blind to a caveats verdict that hides a limitation, so it is caveats only.
+      1b. and its converse, so the implication is closed both ways: an answer that DOES carry a
+         real (non-assumption) caveat must be ANSWER_WITH_CAVEATS, never ANSWERABLE. Without the
+         converse, an ANSWERABLE answer could carry 'includes 59,256 of non-product money' and
+         claim no limitation - the same incoherence as 1, pointing the other way.
+      2. an announced filter must correspond to a real WHERE. An empty window is not a filter and
+         must not be reported as one.
+      3. a requested grouping that was dropped must be recorded as an unmet dimension, never
+         silently returned as a total - WHEREVER the request is represented. A categorical
+         breakdown lives in ir.group_by; a time grain lives in ir.time, NOT group_by, which is
+         exactly why a group_by-only check was blind to the by-period defect that motivated this.
+    """
+    ir = answer.plan.ir
+    out: list[str] = []
+    if kind is VerdictKind.ANSWER_WITH_CAVEATS and not answer.caveats:
+        out.append("answer_with_caveats but no caveat is disclosed")
+    if answer.caveats and kind is not VerdictKind.ANSWER_WITH_CAVEATS:
+        out.append("a real caveat is present but the verdict is not answer_with_caveats")
+    if answer.filters_applied and "WHERE" not in answer.sql.upper():
+        out.append("filters_applied announced but no WHERE clause constrains the query")
+    unrecorded = (set(ir.group_by) - set(answer.plan.group_by)) - set(ir.unmet_dimensions)
+    if unrecorded:
+        out.append(f"requested grouping dropped without recording as unmet: {sorted(unrecorded)}")
+    grain = ir.time.grain if ir.time else None
+    if grain is not None and not _time_grain_honored(answer) and not ir.unmet_dimensions:
+        out.append(
+            f"requested time grain '{grain}' neither grouped, bucketed, "
+            "nor recorded as an unmet dimension"
+        )
+    return out
+
+
 def run_case(model: SemanticModel, con: duckdb.DuckDBPyConnection, case: GoldenCase) -> CaseResult:
     verdict = bind(model, case.ir)
     actual = classify(verdict.kind)
     detail = verdict.reason or ""
+    coherent = True
     if actual is Expected.ANSWER and verdict.plan is not None:
-        # Execute so an 'answer' that would blow up at run time counts as a failure here.
+        # Execute so an 'answer' that would blow up at run time counts as a failure here, and
+        # assert the answer is internally coherent - not merely of the expected verdict class. The
+        # class is the FINALISED one from the finished answer (the same class every consumer
+        # reports), never the provisional bind-time kind.
         answer = execute(con, verdict.plan, model, verdict.caveats)
-        detail = f"{len(answer.rows)} rows"
-    passed = actual is case.expected
+        violations = coherence_violations(answer.verdict_kind(), answer)
+        coherent = not violations
+        detail = f"{len(answer.rows)} rows" + (
+            "" if coherent else "; INCOHERENT: " + "; ".join(violations)
+        )
+    passed = actual is case.expected and coherent
     false_answer = (
         case.expected in {Expected.REFUSE, Expected.CLARIFY} and actual is Expected.ANSWER
     )

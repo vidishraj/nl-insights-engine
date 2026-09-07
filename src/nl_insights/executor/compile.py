@@ -6,7 +6,7 @@ defaults (partition filter, incomplete-period exclusion), so compilation is mech
 from __future__ import annotations
 
 from ..binder.verdict import BoundPlan
-from ..interpreter.ir import CategoricalFilter, NumericFilter, TimeWindow
+from ..interpreter.ir import CategoricalFilter, NumericFilter, TimeWindow, named_period_grain
 
 _NUM_OPS = {"gt": ">", "gte": ">=", "lt": "<", "lte": "<=", "eq": "="}
 _GRAIN_FMT = {"day": "%Y-%m-%d", "week": "%Y-W%W", "month": "%Y-%m", "year": "%Y"}
@@ -75,10 +75,13 @@ def _period_expr(event_time: str, grain: str) -> str:
 def _time(win: TimeWindow, event_time: str, table: str) -> list[str]:
     et = event_time  # already a SQL expression (quoted column or CAST)
     clauses: list[str] = []
-    if win.named_period and win.grain:
-        clauses.append(f"{_period_expr(event_time, win.grain)} = {_lit(win.named_period)}")
-    elif win.named_period:
-        clauses.append(f"strftime({et}, '%Y-%m') = {_lit(win.named_period)}")
+    if win.named_period:
+        # Match the named period at ITS OWN granularity, read from its format, not at the query's
+        # grain: "by month in 2024-Q1" carries a month grain but a quarter window, and formatting
+        # the window as a month ('%Y-%m' vs '2024-Q1') would match nothing. A whole day, month, or
+        # quarter each filters at its own grain.
+        np_grain = named_period_grain(win.named_period) or "month"
+        clauses.append(f"{_period_expr(event_time, np_grain)} = {_lit(win.named_period)}")
     if win.start:
         clauses.append(f"{et} >= {_lit(win.start)}")
     if win.end:
@@ -97,6 +100,16 @@ def compile_sql(plan: BoundPlan, event_time: str | None) -> str:
     ir = plan.ir
     group_terms = [_q(g) for g in plan.group_by]
     select: list[str] = list(group_terms)
+
+    # A time-grain grouping: add a readable period label (2024-01, 2024-Q1) as a leading grouped
+    # column, so "revenue by month" returns one row per month rather than one grand total. Any
+    # named_period/range/last_n bound is still applied as a filter below, on TOP of the grouping.
+    period_alias: str | None = None
+    if plan.time_group_grain and event_time:
+        period_alias = str(plan.time_group_grain)
+        period_expr = _period_expr(event_time, plan.time_group_grain)
+        select.insert(0, f"{period_expr} AS {_q(period_alias)}")
+        group_terms.insert(0, period_expr)
 
     # A period-over-period comparison is NOT compiled here — it has its own executor branch
     # (_compile_period_comparison) that pivots two periods and computes the ranked growth.
@@ -127,4 +140,8 @@ def compile_sql(plan: BoundPlan, event_time: str | None) -> str:
     if ir.top_k:
         direction = "ASC" if ir.top_k.direction == "asc" else "DESC"
         sql += f" ORDER BY {_q(ir.top_k.measure)} {direction} LIMIT {ir.top_k.k}"
+    elif period_alias:
+        # No explicit ranking: a period breakdown reads chronologically. The labels sort
+        # correctly as strings (2024-01 < 2024-02; 2024-Q1 < 2024-Q2).
+        sql += f" ORDER BY {_q(period_alias)} ASC"
     return sql

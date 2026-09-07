@@ -10,10 +10,28 @@ because the live walkthrough asks unseen questions.
 
 from __future__ import annotations
 
+import re
 from enum import StrEnum
 from typing import Literal
 
 from pydantic import BaseModel, Field
+
+
+def named_period_grain(named_period: str | None) -> str | None:
+    """The granularity a named period denotes, read from ITS OWN format: a day (YYYY-MM-DD), a
+    month (YYYY-MM), or a quarter (YYYY-Qn). None if it is not one of those. Both the binder (to
+    tell a redundant grain from a sub-breakdown) and the executor (to filter at the right
+    granularity) read the window's meaning here rather than assume it matches the query's grain.
+    """
+    if not named_period:
+        return None
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", named_period):
+        return "day"
+    if re.fullmatch(r"\d{4}-Q[1-4]", named_period):
+        return "quarter"
+    if re.fullmatch(r"\d{4}-\d{2}", named_period):
+        return "month"
+    return None
 
 
 class Grain(StrEnum):

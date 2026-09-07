@@ -450,8 +450,11 @@ def test_non_product_disclosure_is_correct_and_truncated(syn) -> None:  # type: 
     ]
 
     a = _ans(con, model, QueryIR(measures=["net_revenue"], group_by=[]))  # the real disclosure path
-    disclosure = next((s for s in a.assumptions if "non-PRODUCT" in s), None)
+    # The non-fact disclosure is a CAVEAT now (a limitation of the number: the total is
+    # contaminated by non-product money), not an assumption about how we read the question.
+    disclosure = next((s for s in a.caveats if "non-PRODUCT" in s), None)
     assert disclosure is not None  # a disclosure is emitted at all
+    assert not any("non-PRODUCT" in s for s in a.assumptions)  # and it is NOT in assumptions
     assert f"{exp_count} non-PRODUCT" in disclosure  # the count of non-zero non-fact groups
     assert f"{exp_total:+,.2f}" in disclosure  # the total, covering ALL groups, not just the named
     listed = disclosure.split("(", 1)[1]  # the parenthetical contributor list
