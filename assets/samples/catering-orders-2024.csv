@@ -1,0 +1,203 @@
+order_ref,event_date,client,city,event_type,menu,guests,price_per_guest,order_total,status
+CAT-4101,19/01/2024,Peregrine Foundation,Manchester,Conference,Grazing Table,60,26.00,1560.00,Completed
+CAT-4102,19/01/2024,Tessellate Ltd,Manchester,Conference,Grazing Table,80,26.00,2080.00,Cancelled
+CAT-4103,28/01/2024,Halcyon Media,Bristol,Corporate Lunch,Seated Three Course,40,47.00,1880.00,Completed
+CAT-4104,08/01/2024,Brightwater Trust,Leeds,Wedding,Afternoon Tea,20,22.00,440.00,Completed
+CAT-4105,12/01/2024,Lyndhurst Group,Leeds,Awards Dinner,Seated Three Course,24,47.00,1128.00,Completed
+CAT-4106,02/01/2024,Calder & Voss,London,Product Launch,Afternoon Tea,90,22.00,1980.00,Completed
+CAT-4107,25/01/2024,Nordvik Labs,Bristol,Wedding,Grazing Table,35,26.00,910.00,Completed
+CAT-4108,24/01/2024,Ashford Partners,London,Conference,Canape Selection,20,18.50,370.00,Completed
+CAT-4109,17/01/2024,Tessellate Ltd,Manchester,Conference,Breakfast Service,60,12.75,765.00,Completed
+CAT-4110,02/02/2024,Calder & Voss,London,Wedding,Seated Three Course,35,47.00,1645.00,Cancelled
+CAT-4111,21/02/2024,Lyndhurst Group,Leeds,Product Launch,Bowl Food,150,31.25,4687.50,Completed
+CAT-4112,05/02/2024,Lyndhurst Group,Leeds,Conference,Afternoon Tea,80,22.00,1760.00,Completed
+CAT-4113,20/02/2024,Nordvik Labs,Bristol,Conference,Breakfast Service,75,12.75,956.25,Completed
+CAT-4114,07/02/2024,Tessellate Ltd,Manchester,Corporate Lunch,Grazing Table,24,26.00,624.00,Completed
+CAT-4115,08/02/2024,Brightwater Trust,Leeds,Awards Dinner,Afternoon Tea,60,22.00,1320.00,Completed
+CAT-4116,26/02/2024,Ashford Partners,London,Product Launch,Seated Three Course,50,47.00,2350.00,Cancelled
+CAT-4117,06/02/2024,Halcyon Media,Bristol,Conference,Grazing Table,45,26.00,1170.00,Completed
+CAT-4118,21/02/2024,Halcyon Media,Bristol,Wedding,Breakfast Service,20,12.75,255.00,Completed
+CAT-4119,16/02/2024,Nordvik Labs,Bristol,Corporate Lunch,Seated Three Course,90,47.00,4230.00,Completed
+CAT-4120,04/03/2024,Marrow Street Studio,Bristol,Awards Dinner,Canape Selection,80,18.50,1480.00,Cancelled
+CAT-4121,09/03/2024,Brightwater Trust,Leeds,Wedding,Breakfast Service,35,12.75,446.25,Completed
+CAT-4122,21/03/2024,Tessellate Ltd,Manchester,Product Launch,Afternoon Tea,20,22.00,440.00,Completed
+CAT-4123,28/03/2024,Brightwater Trust,Leeds,Conference,Canape Selection,150,18.50,2775.00,Completed
+CAT-4124,12/03/2024,Calder & Voss,London,Product Launch,Grazing Table,75,26.00,1950.00,Cancelled
+CAT-4125,27/03/2024,Halcyon Media,Bristol,Wedding,Canape Selection,35,18.50,647.50,Completed
+CAT-4126,11/03/2024,Halcyon Media,Bristol,Wedding,Seated Three Course,30,47.00,1410.00,Completed
+CAT-4127,09/03/2024,Calder & Voss,London,Product Launch,Breakfast Service,50,12.75,637.50,Completed
+CAT-4128,18/03/2024,Brightwater Trust,Leeds,Corporate Lunch,Canape Selection,80,18.50,1480.00,Completed
+CAT-4129,27/03/2024,Halcyon Media,Bristol,Corporate Lunch,Bowl Food,60,31.25,1875.00,Cancelled
+CAT-4130,08/03/2024,Peregrine Foundation,Manchester,Product Launch,Breakfast Service,20,12.75,255.00,Cancelled
+CAT-4131,19/03/2024,Tessellate Ltd,Manchester,Awards Dinner,Grazing Table,80,26.00,2080.00,Completed
+CAT-4132,07/04/2024,Marrow Street Studio,Bristol,Awards Dinner,Seated Three Course,100,47.00,4700.00,Completed
+CAT-4133,05/04/2024,Marrow Street Studio,Bristol,Corporate Lunch,Seated Three Course,60,47.00,2820.00,Cancelled
+CAT-4134,19/04/2024,Nordvik Labs,Bristol,Awards Dinner,Breakfast Service,20,12.75,255.00,Completed
+CAT-4135,09/04/2024,Quayside Union,London,Corporate Lunch,Breakfast Service,80,12.75,1020.00,Completed
+CAT-4136,21/04/2024,Nordvik Labs,Bristol,Conference,Canape Selection,30,18.50,555.00,Completed
+CAT-4137,05/04/2024,Quayside Union,London,Awards Dinner,Breakfast Service,150,12.75,1912.50,Completed
+CAT-4138,25/04/2024,Halcyon Media,Bristol,Awards Dinner,Canape Selection,100,18.50,1850.00,Completed
+CAT-4139,26/04/2024,Tessellate Ltd,Manchester,Awards Dinner,Breakfast Service,60,12.75,765.00,Completed
+CAT-4140,18/04/2024,Lyndhurst Group,Leeds,Product Launch,Bowl Food,120,31.25,3750.00,Completed
+CAT-4141,10/04/2024,Calder & Voss,London,Wedding,Canape Selection,45,18.50,832.50,Completed
+CAT-4142,24/04/2024,Marrow Street Studio,Bristol,Wedding,Canape Selection,45,18.50,832.50,Completed
+CAT-4143,14/04/2024,Halcyon Media,Bristol,Awards Dinner,Breakfast Service,150,12.75,1912.50,Cancelled
+CAT-4144,06/04/2024,Marrow Street Studio,Bristol,Product Launch,Seated Three Course,60,47.00,2820.00,Completed
+CAT-4145,19/05/2024,Ashford Partners,London,Conference,Afternoon Tea,60,22.00,1320.00,Completed
+CAT-4146,21/05/2024,Tessellate Ltd,Manchester,Wedding,Breakfast Service,150,12.75,1912.50,Cancelled
+CAT-4147,05/05/2024,Halcyon Media,Bristol,Corporate Lunch,Grazing Table,150,26.00,3900.00,Completed
+CAT-4148,09/05/2024,Ashford Partners,London,Awards Dinner,Canape Selection,45,18.50,832.50,Completed
+CAT-4149,08/05/2024,Marrow Street Studio,Bristol,Corporate Lunch,Seated Three Course,100,47.00,4700.00,Completed
+CAT-4150,08/05/2024,Peregrine Foundation,Manchester,Conference,Bowl Food,80,31.25,2500.00,Completed
+CAT-4151,13/05/2024,Quayside Union,London,Corporate Lunch,Canape Selection,30,18.50,555.00,Completed
+CAT-4152,11/05/2024,Halcyon Media,Bristol,Conference,Seated Three Course,60,47.00,2820.00,Cancelled
+CAT-4153,17/05/2024,Calder & Voss,London,Awards Dinner,Seated Three Course,35,47.00,1645.00,Completed
+CAT-4154,18/05/2024,Marrow Street Studio,Bristol,Corporate Lunch,Canape Selection,50,18.50,925.00,Cancelled
+CAT-4155,25/05/2024,Peregrine Foundation,Manchester,Awards Dinner,Canape Selection,35,18.50,647.50,Cancelled
+CAT-4156,09/05/2024,Tessellate Ltd,Manchester,Awards Dinner,Seated Three Course,60,47.00,2820.00,Cancelled
+CAT-4157,02/05/2024,Lyndhurst Group,Leeds,Corporate Lunch,Bowl Food,50,31.25,1562.50,Completed
+CAT-4158,18/05/2024,Marrow Street Studio,Bristol,Wedding,Grazing Table,20,26.00,520.00,Completed
+CAT-4159,07/05/2024,Quayside Union,London,Awards Dinner,Canape Selection,75,18.50,1387.50,Cancelled
+CAT-4160,07/06/2024,Halcyon Media,Bristol,Conference,Breakfast Service,30,12.75,382.50,Completed
+CAT-4161,23/06/2024,Tessellate Ltd,Manchester,Awards Dinner,Seated Three Course,120,47.00,5640.00,Completed
+CAT-4162,08/06/2024,Calder & Voss,London,Corporate Lunch,Grazing Table,120,26.00,3120.00,Completed
+CAT-4163,01/06/2024,Calder & Voss,London,Conference,Breakfast Service,50,12.75,637.50,Completed
+CAT-4164,05/06/2024,Marrow Street Studio,Bristol,Product Launch,Bowl Food,90,31.25,2812.50,Completed
+CAT-4165,19/06/2024,Peregrine Foundation,Manchester,Wedding,Grazing Table,100,26.00,2600.00,Completed
+CAT-4166,06/06/2024,Marrow Street Studio,Bristol,Awards Dinner,Grazing Table,150,26.00,3900.00,Completed
+CAT-4167,09/06/2024,Quayside Union,London,Corporate Lunch,Afternoon Tea,50,22.00,1100.00,Cancelled
+CAT-4168,08/06/2024,Lyndhurst Group,Leeds,Corporate Lunch,Bowl Food,120,31.25,3750.00,Completed
+CAT-4169,13/06/2024,Quayside Union,London,Corporate Lunch,Bowl Food,120,31.25,3750.00,Completed
+CAT-4170,17/06/2024,Brightwater Trust,Leeds,Awards Dinner,Afternoon Tea,75,22.00,1650.00,Completed
+CAT-4171,14/06/2024,Marrow Street Studio,Bristol,Wedding,Breakfast Service,45,12.75,573.75,Completed
+CAT-4172,05/06/2024,Nordvik Labs,Bristol,Corporate Lunch,Seated Three Course,30,47.00,1410.00,Cancelled
+CAT-4173,15/06/2024,Marrow Street Studio,Bristol,Product Launch,Canape Selection,20,18.50,370.00,Completed
+CAT-4174,04/06/2024,Marrow Street Studio,Bristol,Conference,Bowl Food,150,31.25,4687.50,Completed
+CAT-4175,13/06/2024,Brightwater Trust,Leeds,Wedding,Bowl Food,45,31.25,1406.25,Completed
+CAT-4176,12/06/2024,Tessellate Ltd,Manchester,Conference,Bowl Food,75,31.25,2343.75,Completed
+CAT-4177,08/07/2024,Nordvik Labs,Bristol,Wedding,Afternoon Tea,50,22.00,1100.00,Cancelled
+CAT-4178,04/07/2024,Ashford Partners,London,Conference,Canape Selection,35,18.50,647.50,Cancelled
+CAT-4179,13/07/2024,Tessellate Ltd,Manchester,Corporate Lunch,Bowl Food,100,31.25,3125.00,Completed
+CAT-4180,18/07/2024,Quayside Union,London,Wedding,Canape Selection,45,18.50,832.50,Completed
+CAT-4181,14/07/2024,Nordvik Labs,Bristol,Corporate Lunch,Bowl Food,120,31.25,3750.00,Cancelled
+CAT-4182,17/07/2024,Marrow Street Studio,Bristol,Corporate Lunch,Breakfast Service,90,12.75,1147.50,Completed
+CAT-4183,03/07/2024,Lyndhurst Group,Leeds,Product Launch,Canape Selection,24,18.50,444.00,Completed
+CAT-4184,01/07/2024,Peregrine Foundation,Manchester,Conference,Seated Three Course,60,47.00,2820.00,Completed
+CAT-4185,22/07/2024,Brightwater Trust,Leeds,Conference,Grazing Table,24,26.00,624.00,Cancelled
+CAT-4186,18/07/2024,Ashford Partners,London,Corporate Lunch,Grazing Table,90,26.00,2340.00,Cancelled
+CAT-4187,16/07/2024,Tessellate Ltd,Manchester,Product Launch,Canape Selection,24,18.50,444.00,Completed
+CAT-4188,07/07/2024,Quayside Union,London,Corporate Lunch,Breakfast Service,75,12.75,956.25,Cancelled
+CAT-4189,04/07/2024,Lyndhurst Group,Leeds,Wedding,Canape Selection,120,18.50,2220.00,Cancelled
+CAT-4190,03/07/2024,Brightwater Trust,Leeds,Wedding,Grazing Table,80,26.00,2080.00,Completed
+CAT-4191,07/07/2024,Marrow Street Studio,Bristol,Awards Dinner,Afternoon Tea,90,22.00,1980.00,Completed
+CAT-4192,16/07/2024,Halcyon Media,Bristol,Awards Dinner,Bowl Food,50,31.25,1562.50,Cancelled
+CAT-4193,12/08/2024,Marrow Street Studio,Bristol,Awards Dinner,Seated Three Course,24,47.00,1128.00,Completed
+CAT-4194,19/08/2024,Brightwater Trust,Leeds,Conference,Canape Selection,120,18.50,2220.00,Completed
+CAT-4195,23/08/2024,Lyndhurst Group,Leeds,Corporate Lunch,Grazing Table,30,26.00,780.00,Cancelled
+CAT-4196,14/08/2024,Quayside Union,London,Conference,Breakfast Service,50,12.75,637.50,Completed
+CAT-4197,18/08/2024,Nordvik Labs,Bristol,Wedding,Afternoon Tea,24,22.00,528.00,Completed
+CAT-4198,23/08/2024,Peregrine Foundation,Manchester,Corporate Lunch,Grazing Table,50,26.00,1300.00,Completed
+CAT-4199,19/08/2024,Lyndhurst Group,Leeds,Corporate Lunch,Breakfast Service,45,12.75,573.75,Completed
+CAT-4200,21/08/2024,Calder & Voss,London,Awards Dinner,Seated Three Course,120,47.00,5640.00,Completed
+CAT-4201,22/08/2024,Brightwater Trust,Leeds,Wedding,Canape Selection,90,18.50,1665.00,Completed
+CAT-4202,09/08/2024,Nordvik Labs,Bristol,Product Launch,Grazing Table,40,26.00,1040.00,Completed
+CAT-4203,20/08/2024,Brightwater Trust,Leeds,Corporate Lunch,Afternoon Tea,90,22.00,1980.00,Cancelled
+CAT-4204,14/08/2024,Quayside Union,London,Awards Dinner,Seated Three Course,100,47.00,4700.00,Completed
+CAT-4205,17/09/2024,Ashford Partners,London,Awards Dinner,Grazing Table,100,26.00,2600.00,Completed
+CAT-4206,15/09/2024,Brightwater Trust,Leeds,Corporate Lunch,Breakfast Service,100,12.75,1275.00,Completed
+CAT-4207,08/09/2024,Halcyon Media,Bristol,Wedding,Grazing Table,35,26.00,910.00,Completed
+CAT-4208,09/09/2024,Tessellate Ltd,Manchester,Product Launch,Afternoon Tea,100,22.00,2200.00,Completed
+CAT-4209,12/09/2024,Nordvik Labs,Bristol,Corporate Lunch,Afternoon Tea,45,22.00,990.00,Cancelled
+CAT-4210,07/09/2024,Nordvik Labs,Bristol,Product Launch,Bowl Food,24,31.25,750.00,Completed
+CAT-4211,10/09/2024,Brightwater Trust,Leeds,Product Launch,Canape Selection,150,18.50,2775.00,Cancelled
+CAT-4212,27/09/2024,Halcyon Media,Bristol,Conference,Afternoon Tea,100,22.00,2200.00,Completed
+CAT-4213,14/09/2024,Quayside Union,London,Corporate Lunch,Canape Selection,35,18.50,647.50,Completed
+CAT-4214,27/09/2024,Quayside Union,London,Product Launch,Grazing Table,60,26.00,1560.00,Completed
+CAT-4215,01/09/2024,Brightwater Trust,Leeds,Awards Dinner,Bowl Food,24,31.25,750.00,Completed
+CAT-4216,27/09/2024,Quayside Union,London,Corporate Lunch,Seated Three Course,150,47.00,7050.00,Completed
+CAT-4217,07/09/2024,Tessellate Ltd,Manchester,Product Launch,Canape Selection,50,18.50,925.00,Completed
+CAT-4218,12/09/2024,Nordvik Labs,Bristol,Product Launch,Breakfast Service,100,12.75,1275.00,Completed
+CAT-4219,16/09/2024,Calder & Voss,London,Awards Dinner,Bowl Food,30,31.25,937.50,Completed
+CAT-4220,22/09/2024,Quayside Union,London,Awards Dinner,Grazing Table,90,26.00,2340.00,Completed
+CAT-4221,21/09/2024,Ashford Partners,London,Corporate Lunch,Bowl Food,100,31.25,3125.00,Completed
+CAT-4222,14/09/2024,Lyndhurst Group,Leeds,Conference,Bowl Food,150,31.25,4687.50,Completed
+CAT-4223,01/09/2024,Lyndhurst Group,Leeds,Awards Dinner,Seated Three Course,45,47.00,2115.00,Cancelled
+CAT-4224,19/10/2024,Calder & Voss,London,Corporate Lunch,Grazing Table,30,26.00,780.00,Cancelled
+CAT-4225,03/10/2024,Quayside Union,London,Wedding,Canape Selection,100,18.50,1850.00,Completed
+CAT-4226,03/10/2024,Halcyon Media,Bristol,Awards Dinner,Bowl Food,40,31.25,1250.00,Completed
+CAT-4227,05/10/2024,Lyndhurst Group,Leeds,Conference,Grazing Table,45,26.00,1170.00,Completed
+CAT-4228,14/10/2024,Brightwater Trust,Leeds,Awards Dinner,Afternoon Tea,90,22.00,1980.00,Completed
+CAT-4229,19/10/2024,Calder & Voss,London,Awards Dinner,Canape Selection,120,18.50,2220.00,Cancelled
+CAT-4230,15/10/2024,Marrow Street Studio,Bristol,Product Launch,Afternoon Tea,30,22.00,660.00,Completed
+CAT-4231,25/10/2024,Tessellate Ltd,Manchester,Wedding,Bowl Food,120,31.25,3750.00,Completed
+CAT-4232,12/10/2024,Marrow Street Studio,Bristol,Wedding,Bowl Food,24,31.25,750.00,Cancelled
+CAT-4233,21/10/2024,Lyndhurst Group,Leeds,Product Launch,Grazing Table,120,26.00,3120.00,Completed
+CAT-4234,28/10/2024,Quayside Union,London,Corporate Lunch,Grazing Table,60,26.00,1560.00,Completed
+CAT-4235,01/10/2024,Brightwater Trust,Leeds,Awards Dinner,Grazing Table,24,26.00,624.00,Completed
+CAT-4236,24/10/2024,Brightwater Trust,Leeds,Corporate Lunch,Seated Three Course,75,47.00,3525.00,Cancelled
+CAT-4237,11/10/2024,Brightwater Trust,Leeds,Wedding,Grazing Table,20,26.00,520.00,Cancelled
+CAT-4238,18/10/2024,Brightwater Trust,Leeds,Awards Dinner,Seated Three Course,60,47.00,2820.00,Completed
+CAT-4239,11/10/2024,Tessellate Ltd,Manchester,Awards Dinner,Breakfast Service,24,12.75,306.00,Completed
+CAT-4240,02/10/2024,Brightwater Trust,Leeds,Corporate Lunch,Canape Selection,30,18.50,555.00,Completed
+CAT-4241,10/10/2024,Calder & Voss,London,Awards Dinner,Canape Selection,50,18.50,925.00,Cancelled
+CAT-4242,04/10/2024,Marrow Street Studio,Bristol,Awards Dinner,Grazing Table,150,26.00,3900.00,Completed
+CAT-4243,26/10/2024,Calder & Voss,London,Awards Dinner,Afternoon Tea,20,22.00,440.00,Completed
+CAT-4244,18/10/2024,Halcyon Media,Bristol,Corporate Lunch,Afternoon Tea,90,22.00,1980.00,Cancelled
+CAT-4245,07/10/2024,Calder & Voss,London,Wedding,Afternoon Tea,120,22.00,2640.00,Completed
+CAT-4246,25/11/2024,Peregrine Foundation,Manchester,Corporate Lunch,Seated Three Course,60,47.00,2820.00,Cancelled
+CAT-4247,07/11/2024,Ashford Partners,London,Wedding,Bowl Food,100,31.25,3125.00,Completed
+CAT-4248,09/11/2024,Marrow Street Studio,Bristol,Product Launch,Bowl Food,100,31.25,3125.00,Completed
+CAT-4249,25/11/2024,Peregrine Foundation,Manchester,Wedding,Afternoon Tea,100,22.00,2200.00,Completed
+CAT-4250,11/11/2024,Halcyon Media,Bristol,Product Launch,Canape Selection,30,18.50,555.00,Completed
+CAT-4251,19/11/2024,Halcyon Media,Bristol,Product Launch,Canape Selection,100,18.50,1850.00,Completed
+CAT-4252,24/11/2024,Calder & Voss,London,Awards Dinner,Afternoon Tea,75,22.00,1650.00,Cancelled
+CAT-4253,08/11/2024,Nordvik Labs,Bristol,Wedding,Breakfast Service,24,12.75,306.00,Completed
+CAT-4254,21/11/2024,Quayside Union,London,Awards Dinner,Bowl Food,80,31.25,2500.00,Completed
+CAT-4255,20/11/2024,Ashford Partners,London,Wedding,Grazing Table,100,26.00,2600.00,Completed
+CAT-4256,08/11/2024,Tessellate Ltd,Manchester,Corporate Lunch,Canape Selection,60,18.50,1110.00,Completed
+CAT-4257,25/11/2024,Halcyon Media,Bristol,Conference,Grazing Table,90,26.00,2340.00,Completed
+CAT-4258,26/11/2024,Tessellate Ltd,Manchester,Product Launch,Seated Three Course,24,47.00,1128.00,Completed
+CAT-4259,18/11/2024,Marrow Street Studio,Bristol,Product Launch,Bowl Food,120,31.25,3750.00,Completed
+CAT-4260,10/11/2024,Ashford Partners,London,Wedding,Bowl Food,45,31.25,1406.25,Completed
+CAT-4261,04/11/2024,Nordvik Labs,Bristol,Awards Dinner,Afternoon Tea,30,22.00,660.00,Completed
+CAT-4262,06/11/2024,Brightwater Trust,Leeds,Conference,Seated Three Course,30,47.00,1410.00,Cancelled
+CAT-4263,09/11/2024,Halcyon Media,Bristol,Corporate Lunch,Canape Selection,80,18.50,1480.00,Completed
+CAT-4264,27/11/2024,Peregrine Foundation,Manchester,Conference,Bowl Food,150,31.25,4687.50,Completed
+CAT-4265,04/11/2024,Calder & Voss,London,Product Launch,Breakfast Service,150,12.75,1912.50,Cancelled
+CAT-4266,17/11/2024,Ashford Partners,London,Product Launch,Afternoon Tea,40,22.00,880.00,Completed
+CAT-4267,08/11/2024,Ashford Partners,London,Wedding,Afternoon Tea,45,22.00,990.00,Completed
+CAT-4268,12/11/2024,Brightwater Trust,Leeds,Conference,Breakfast Service,24,12.75,306.00,Completed
+CAT-4269,18/11/2024,Marrow Street Studio,Bristol,Product Launch,Bowl Food,100,31.25,3125.00,Cancelled
+CAT-4270,08/11/2024,Lyndhurst Group,Leeds,Product Launch,Grazing Table,150,26.00,3900.00,Completed
+CAT-4271,11/11/2024,Quayside Union,London,Conference,Canape Selection,75,18.50,1387.50,Completed
+CAT-4272,18/12/2024,Peregrine Foundation,Manchester,Conference,Breakfast Service,50,12.75,637.50,Completed
+CAT-4273,07/12/2024,Peregrine Foundation,Manchester,Conference,Seated Three Course,20,47.00,940.00,Completed
+CAT-4274,19/12/2024,Marrow Street Studio,Bristol,Product Launch,Grazing Table,120,26.00,3120.00,Completed
+CAT-4275,23/12/2024,Marrow Street Studio,Bristol,Awards Dinner,Bowl Food,35,31.25,1093.75,Completed
+CAT-4276,06/12/2024,Quayside Union,London,Conference,Grazing Table,50,26.00,1300.00,Completed
+CAT-4277,23/12/2024,Ashford Partners,London,Awards Dinner,Bowl Food,30,31.25,937.50,Completed
+CAT-4278,12/12/2024,Brightwater Trust,Leeds,Awards Dinner,Grazing Table,150,26.00,3900.00,Completed
+CAT-4279,23/12/2024,Nordvik Labs,Bristol,Corporate Lunch,Bowl Food,60,31.25,1875.00,Cancelled
+CAT-4280,02/12/2024,Brightwater Trust,Leeds,Corporate Lunch,Seated Three Course,120,47.00,5640.00,Completed
+CAT-4281,03/12/2024,Quayside Union,London,Awards Dinner,Bowl Food,35,31.25,1093.75,Completed
+CAT-4282,17/12/2024,Nordvik Labs,Bristol,Awards Dinner,Canape Selection,100,18.50,1850.00,Completed
+CAT-4283,18/12/2024,Halcyon Media,Bristol,Product Launch,Bowl Food,45,31.25,1406.25,Completed
+CAT-4284,05/12/2024,Lyndhurst Group,Leeds,Conference,Seated Three Course,90,47.00,4230.00,Completed
+CAT-4285,09/12/2024,Lyndhurst Group,Leeds,Product Launch,Bowl Food,30,31.25,937.50,Completed
+CAT-4286,10/12/2024,Tessellate Ltd,Manchester,Wedding,Breakfast Service,75,12.75,956.25,Completed
+CAT-4287,05/12/2024,Nordvik Labs,Bristol,Awards Dinner,Breakfast Service,45,12.75,573.75,Completed
+CAT-4288,09/12/2024,Ashford Partners,London,Product Launch,Seated Three Course,24,47.00,1128.00,Cancelled
+CAT-4289,10/12/2024,Calder & Voss,London,Corporate Lunch,Bowl Food,40,31.25,1250.00,Completed
+CAT-4290,07/12/2024,Marrow Street Studio,Bristol,Wedding,Afternoon Tea,120,22.00,2640.00,Completed
+CAT-4291,04/12/2024,Halcyon Media,Bristol,Corporate Lunch,Bowl Food,35,31.25,1093.75,Cancelled
+CAT-4292,23/12/2024,Brightwater Trust,Leeds,Awards Dinner,Afternoon Tea,80,22.00,1760.00,Cancelled
+CAT-4293,11/12/2024,Ashford Partners,London,Wedding,Afternoon Tea,120,22.00,2640.00,Cancelled
+CAT-4294,14/12/2024,Quayside Union,London,Corporate Lunch,Canape Selection,24,18.50,444.00,Completed
+CAT-4295,20/12/2024,Brightwater Trust,Leeds,Corporate Lunch,Seated Three Course,30,47.00,1410.00,Cancelled
+CAT-4296,09/12/2024,Ashford Partners,London,Corporate Lunch,Canape Selection,24,18.50,444.00,Cancelled
+CAT-4297,08/12/2024,Quayside Union,London,Wedding,Afternoon Tea,50,22.00,1100.00,Cancelled
+CAT-4298,08/12/2024,Marrow Street Studio,Bristol,Wedding,Afternoon Tea,40,22.00,880.00,Cancelled
+CAT-4299,12/12/2024,Nordvik Labs,Bristol,Corporate Lunch,Breakfast Service,150,12.75,1912.50,Completed
+CAT-4300,13/12/2024,Brightwater Trust,Leeds,Corporate Lunch,Seated Three Course,20,47.00,940.00,Cancelled
+CAT-4301,24/12/2024,Marrow Street Studio,Bristol,Corporate Lunch,Seated Three Course,40,47.00,1880.00,Completed
+CAT-4302,19/12/2024,Marrow Street Studio,Bristol,Corporate Lunch,Grazing Table,40,26.00,1040.00,Completed

@@ -104,6 +104,15 @@
       -webkit-overflow-scrolling: touch;
       white-space: nowrap;
     }
+    .samples{ margin-top:12px }
+    .samples-lead{ margin-bottom:8px; font-size:13px }
+    .sample{ display:flex; gap:12px; align-items:flex-start; justify-content:space-between;
+             padding:10px 12px; border:1px solid var(--line,#2a2f3a); border-radius:8px; margin-bottom:8px }
+    .sample b{ display:block }
+    .sample .muted{ font-size:12px; margin-top:2px }
+    .sample-actions{ display:flex; gap:8px; flex:0 0 auto; align-items:center }
+    .sample-actions a{ font-size:13px; white-space:nowrap }
+    @media(max-width:640px){ .sample{ flex-direction:column } }
     /* Question box full width; the Ask button + checkbox drop beneath, not crushed. */
     .row input[type=text] { flex: 1 1 100%; min-width: 0; }
   }
@@ -124,6 +133,10 @@
       <input type="text" id="dsname" placeholder="dataset name (optional)" style="max-width:220px; flex:0 1 220px"/>
       <button id="ingest">Ingest</button>
       <span class="muted" id="ingestState"></span>
+    </div>
+    <div class="samples hidden" id="samples">
+      <div class="muted samples-lead">or load a bundled sample — same pipeline, and each is downloadable to inspect first</div>
+      <div id="sampleList"></div>
     </div>
     <ol class="tree hidden" id="ingestTree"></ol>
   </div>
@@ -388,18 +401,54 @@ $('ingest').onclick = async () => {
   // Phase 1: browser -> server byte transfer, shown as the first tree node.
   const up = await uploadWithProgress(url, f, $('ingestTree'), INGEST_STAGES);
   if(!up.ok){ $('ingest').disabled = false; $('ingestState').textContent='upload failed'; return; }
-  const job = up.job;
   // Phase 2: server pipeline over SSE, with the finished upload row kept above it.
-  $('ingestState').textContent='ingesting job '+job.job_id.slice(0,8)+'…';
-  const done = await streamJob(job.job_id, $('ingestTree'), INGEST_STAGES, up.leadRows);
+  await runIngestJob(up.job, up.leadRows);
   $('ingest').disabled = false;
-  if(!done || done.state!=='succeeded'){ $('ingestState').textContent='failed: '+(done?.error?.message||'unknown'); return; }
+};
+
+// Phase 2 shared by an upload and a bundled sample: the SAME stage tree, model render, and
+// ask-card reveal drive off the SAME job stream, so a sample is not a shortcut around the
+// pipeline — only the byte-transfer phase differs (a sample skips it, nothing was uploaded).
+async function runIngestJob(job, leadRows){
+  $('ingestTree').classList.remove('hidden');
+  $('ingestState').textContent='ingesting job '+job.job_id.slice(0,8)+'…';
+  const done = await streamJob(job.job_id, $('ingestTree'), INGEST_STAGES, leadRows||[]);
+  if(!done || done.state!=='succeeded'){ $('ingestState').textContent='failed: '+(done?.error?.message||'unknown'); return false; }
   $('ingestState').textContent='ready · dataset '+job.dataset_id;
   currentDataset = job.dataset_id;
   const model = await (await fetch('/datasets/'+currentDataset)).json();
   renderModel(model);
   $('askCard').classList.remove('hidden');
-};
+  return true;
+}
+
+// The bundled samples: one click POSTs an OPAQUE id (never a path) and streams the same job.
+async function loadSample(id){
+  const btns = document.querySelectorAll('.sample-load');
+  btns.forEach(b=>b.disabled=true);
+  $('ingestState').textContent='loading sample…';
+  try {
+    const r = await fetch('/samples/'+encodeURIComponent(id), {method:'POST'});
+    if(!r.ok){ $('ingestState').textContent='could not load sample (HTTP '+r.status+')'; return; }
+    await runIngestJob(await r.json(), []);
+  } finally { btns.forEach(b=>b.disabled=false); }
+}
+
+async function renderSamples(){
+  try {
+    const data = await (await fetch('/samples')).json();
+    const list = (data && data.samples) || [];
+    if(!list.length) return;
+    $('sampleList').innerHTML = list.map(s =>
+      '<div class="sample"><div><b>'+esc(s.label)+'</b><div class="muted">'+esc(s.description)+'</div></div>'+
+      '<div class="sample-actions"><button class="sample-load" data-id="'+esc(s.id)+'">Load</button>'+
+      '<a href="'+esc(s.download)+'" download>Download</a></div></div>'
+    ).join('');
+    $('sampleList').querySelectorAll('.sample-load').forEach(b=> b.onclick=()=>loadSample(b.dataset.id));
+    $('samples').classList.remove('hidden');
+  } catch(e){ /* the picker is optional; an upload still works */ }
+}
+renderSamples();
 
 function confBar(c){ return '<span class="bar"><i style="width:'+Math.round((c||0)*100)+'%"></i></span> '+(c!=null?c.toFixed(2):''); }
 

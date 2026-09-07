@@ -69,6 +69,16 @@ show refusal on the credential-free path — **"how many distinct suppliers are 
 model declines rather than inventing one). The glass-box UI at
 [http://localhost:8000/](http://localhost:8000/) does all of this in the browser.
 
+**Three bundled sample datasets** load in one click from that UI (or `GET /samples`,
+`POST /samples/{id}`, `GET /samples/{id}/download`) so a grader can skip the upload and
+still exercise the whole pipeline. They are chosen to walk the taxonomy: a catering file
+with a verified stored total, a storefront file whose revenue is *derived* from unit price
+times quantity (no total column), and a sensor-readings file with no money at all, so a
+revenue question is refused rather than invented. Each `id` is a key into a fixed
+allowlist, never a filename: an unknown id is a shaped 404 and no request string ever
+reaches the filesystem. A sample runs the exact same ingest as an upload, and a repeat
+click reuses the dataset instead of duplicating it.
+
 These cassettes are **real recordings from a live model** — both role proposal and
 interpretation (`recorded_by: "recorded (ambient)"` in `fixtures/llm/`) — so the
 credential-free demo replays the actual "LLM proposes, code disposes" pipeline, not a

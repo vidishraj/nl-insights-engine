@@ -27,6 +27,7 @@ from ..config import Settings
 from ..jobs import DatasetStore, JobManager, load_persisted
 from ..provider import LLMProvider, build_provider
 from ..redact import redact_server_paths
+from .samples import SAMPLES, get_sample
 
 _STATIC = Path(__file__).resolve().parent / "static"
 
@@ -219,6 +220,52 @@ def create_app(settings: Settings | None = None, provider: LLMProvider | None = 
             "dataset_id": view.dataset_id,
             "links": _links(view.id),
         }
+
+    # -- bundled samples --------------------------------------------------------
+    @app.get("/samples")
+    def list_samples() -> dict[str, Any]:
+        return {
+            "samples": [
+                {
+                    "id": s.id,
+                    "label": s.label,
+                    "description": s.description,
+                    "download": f"/samples/{s.id}/download",
+                }
+                for s in SAMPLES.values()
+            ]
+        }
+
+    @app.post("/samples/{sample_id}", status_code=202)
+    async def load_sample(sample_id: str) -> dict[str, Any]:
+        # The id is an allowlist key, never a path. A miss is a 404, not a filesystem lookup.
+        spec = get_sample(sample_id)
+        if spec is None:
+            raise ApiError("sample_not_found", f"no sample {sample_id}", 404)
+        # The SAME pipeline an upload runs: submit_ingest over a constant path. A stable id and
+        # idempotency key mean a repeat click reuses the existing dataset rather than creating a
+        # duplicate, so a double click stays tidy.
+        view = manager().submit_ingest(
+            source=spec.path,
+            name=f"sample_{spec.id}",
+            idempotency_key=f"sample:{spec.id}",
+            display_name=spec.filename,
+        )
+        return {
+            "job_id": view.id,
+            "kind": view.kind,
+            "state": view.state,
+            "dataset_id": view.dataset_id,
+            "links": _links(view.id),
+        }
+
+    @app.get("/samples/{sample_id}/download")
+    def download_sample(sample_id: str) -> FileResponse:
+        spec = get_sample(sample_id)
+        if spec is None:
+            raise ApiError("sample_not_found", f"no sample {sample_id}", 404)
+        # Served as an attachment with a sensible filename, the SAME bytes ingest reads.
+        return FileResponse(spec.path, media_type="text/csv", filename=spec.filename)
 
     # -- jobs -------------------------------------------------------------------
     @app.get("/jobs/{job_id}")

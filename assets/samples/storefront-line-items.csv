@@ -1,0 +1,199 @@
+line_id,sale_date,category,product,units,price_each
+L5000,2024-01-24,Garden,Terracotta Pot,6,6.50
+L5001,2024-01-01,Garden,Terracotta Pot,2,6.00
+L5002,2024-01-18,Garden,Terracotta Pot,4,6.50
+L5003,2024-01-04,Kitchen,Cast Pan,7,38.00
+L5004,2024-01-05,Kitchen,Cast Pan,2,38.00
+L5005,2024-01-07,Garden,Watering Can,11,14.50
+L5006,2024-01-18,Hardware,Tape Measure,3,7.50
+L5007,2024-01-19,Garden,Trowel,2,9.00
+L5008,2024-01-28,Garden,Terracotta Pot,11,6.50
+L5009,2024-01-21,Stationery,Notebook,2,4.50
+L5010,2024-01-14,Hardware,Tape Measure,4,8.00
+L5011,2024-02-15,Garden,Terracotta Pot,2,6.50
+L5012,2024-02-08,Kitchen,Enamel Mug,2,7.50
+L5013,2024-02-25,Garden,Watering Can,2,14.50
+L5014,2024-02-04,Stationery,Ink Pen,5,3.50
+L5015,2024-02-01,Kitchen,Chopping Board,10,12.00
+L5016,2024-02-06,Stationery,Ink Pen,5,3.00
+L5017,2024-02-01,Garden,Trowel,9,8.50
+L5018,2024-02-06,Garden,Watering Can,8,14.50
+L5019,2024-02-05,Garden,Trowel,11,9.00
+L5020,2024-02-20,Hardware,Tape Measure,6,7.50
+L5021,2024-02-10,Hardware,Screwdriver Set,8,22.00
+L5022,2024-02-02,Kitchen,Chopping Board,8,11.50
+L5023,2024-03-07,Hardware,LED Bulb,9,4.50
+L5024,2024-03-20,Garden,Trowel,1,8.50
+L5025,2024-03-19,Garden,Watering Can,10,14.50
+L5026,2024-03-25,Garden,Watering Can,2,14.50
+L5027,2024-03-22,Stationery,Ink Pen,8,3.50
+L5028,2024-03-07,Stationery,Notebook,6,4.50
+L5029,2024-03-23,Kitchen,Chopping Board,4,12.50
+L5030,2024-03-10,Hardware,LED Bulb,6,4.00
+L5031,2024-03-18,Garden,Watering Can,6,14.50
+L5032,2024-03-01,Hardware,Tape Measure,10,8.00
+L5033,2024-03-16,Stationery,Ink Pen,12,3.50
+L5034,2024-03-28,Garden,Terracotta Pot,3,6.50
+L5035,2024-03-14,Garden,Trowel,6,9.00
+L5036,2024-04-05,Kitchen,Chopping Board,9,12.00
+L5037,2024-04-07,Hardware,LED Bulb,2,4.50
+L5038,2024-04-07,Hardware,Screwdriver Set,11,22.00
+L5039,2024-04-24,Hardware,LED Bulb,10,5.00
+L5040,2024-04-16,Garden,Terracotta Pot,12,6.50
+L5041,2024-04-23,Kitchen,Cast Pan,4,37.50
+L5042,2024-04-13,Kitchen,Chopping Board,10,12.00
+L5043,2024-04-10,Hardware,Tape Measure,2,8.50
+L5044,2024-04-19,Kitchen,Chopping Board,5,11.50
+L5045,2024-04-07,Garden,Trowel,12,8.50
+L5046,2024-04-10,Kitchen,Cast Pan,9,38.00
+L5047,2024-04-22,Stationery,Notebook,12,5.00
+L5048,2024-04-24,Hardware,Tape Measure,12,8.50
+L5049,2024-04-27,Hardware,Screwdriver Set,5,22.50
+L5050,2024-05-13,Stationery,Notebook,3,4.50
+L5051,2024-05-11,Stationery,Ink Pen,1,4.00
+L5052,2024-05-04,Garden,Trowel,6,8.50
+L5053,2024-05-21,Stationery,Ink Pen,11,3.50
+L5054,2024-05-16,Hardware,Tape Measure,1,7.50
+L5055,2024-05-23,Stationery,Ink Pen,9,4.00
+L5056,2024-05-17,Hardware,Screwdriver Set,5,22.00
+L5057,2024-05-27,Hardware,Tape Measure,6,8.50
+L5058,2024-05-10,Hardware,Tape Measure,9,8.50
+L5059,2024-05-03,Stationery,Notebook,3,5.00
+L5060,2024-05-24,Hardware,LED Bulb,12,4.50
+L5061,2024-05-15,Hardware,Screwdriver Set,1,22.00
+L5062,2024-05-24,Kitchen,Enamel Mug,10,8.00
+L5063,2024-05-07,Kitchen,Cast Pan,4,38.00
+L5064,2024-05-26,Garden,Terracotta Pot,9,6.50
+L5065,2024-06-24,Kitchen,Chopping Board,11,11.50
+L5066,2024-06-20,Garden,Trowel,3,9.00
+L5067,2024-06-01,Stationery,Notebook,5,5.00
+L5068,2024-06-06,Stationery,Ink Pen,11,3.00
+L5069,2024-06-13,Garden,Watering Can,7,14.00
+L5070,2024-06-26,Garden,Watering Can,7,15.00
+L5071,2024-06-03,Kitchen,Chopping Board,4,12.50
+L5072,2024-06-21,Garden,Watering Can,1,14.00
+L5073,2024-06-09,Garden,Trowel,4,8.50
+L5074,2024-06-23,Kitchen,Cast Pan,10,37.50
+L5075,2024-06-06,Stationery,Notebook,4,5.00
+L5076,2024-06-18,Hardware,Screwdriver Set,12,22.00
+L5077,2024-06-10,Kitchen,Enamel Mug,6,7.00
+L5078,2024-06-21,Kitchen,Chopping Board,11,12.50
+L5079,2024-06-12,Garden,Terracotta Pot,6,6.50
+L5080,2024-06-25,Hardware,Tape Measure,5,8.00
+L5081,2024-07-05,Garden,Trowel,12,9.00
+L5082,2024-07-22,Garden,Trowel,8,9.00
+L5083,2024-07-22,Stationery,Ink Pen,6,4.00
+L5084,2024-07-20,Stationery,Notebook,10,5.00
+L5085,2024-07-19,Garden,Terracotta Pot,6,6.50
+L5086,2024-07-28,Stationery,Notebook,5,5.00
+L5087,2024-07-24,Kitchen,Chopping Board,6,12.50
+L5088,2024-07-22,Kitchen,Cast Pan,4,38.50
+L5089,2024-07-28,Garden,Trowel,10,9.50
+L5090,2024-07-08,Stationery,Ink Pen,4,4.00
+L5091,2024-07-12,Stationery,Ink Pen,5,3.00
+L5092,2024-07-05,Garden,Terracotta Pot,2,7.00
+L5093,2024-07-26,Garden,Watering Can,7,15.00
+L5094,2024-07-27,Garden,Terracotta Pot,6,6.00
+L5095,2024-07-02,Kitchen,Enamel Mug,11,7.00
+L5096,2024-07-04,Garden,Watering Can,12,14.50
+L5097,2024-07-26,Garden,Terracotta Pot,8,6.50
+L5098,2024-08-19,Kitchen,Enamel Mug,9,8.00
+L5099,2024-08-12,Hardware,Tape Measure,4,8.00
+L5100,2024-08-10,Stationery,Ink Pen,3,3.50
+L5101,2024-08-01,Stationery,Notebook,8,5.00
+L5102,2024-08-23,Garden,Watering Can,2,14.00
+L5103,2024-08-14,Kitchen,Enamel Mug,7,7.00
+L5104,2024-08-01,Hardware,Tape Measure,6,8.00
+L5105,2024-08-08,Kitchen,Enamel Mug,5,7.50
+L5106,2024-08-24,Kitchen,Cast Pan,7,38.50
+L5107,2024-08-03,Hardware,LED Bulb,8,5.00
+L5108,2024-08-16,Hardware,Screwdriver Set,4,22.00
+L5109,2024-08-10,Stationery,Ink Pen,5,3.00
+L5110,2024-08-22,Garden,Watering Can,11,14.50
+L5111,2024-08-28,Stationery,Ink Pen,9,3.50
+L5112,2024-08-23,Hardware,Tape Measure,2,8.00
+L5113,2024-08-23,Hardware,Tape Measure,4,8.50
+L5114,2024-08-08,Stationery,Ink Pen,10,3.00
+L5115,2024-08-21,Hardware,Tape Measure,10,8.00
+L5116,2024-09-12,Stationery,Notebook,6,4.50
+L5117,2024-09-26,Hardware,Screwdriver Set,12,21.50
+L5118,2024-09-16,Garden,Terracotta Pot,8,6.50
+L5119,2024-09-16,Garden,Watering Can,4,14.00
+L5120,2024-09-24,Stationery,Notebook,10,5.00
+L5121,2024-09-08,Hardware,LED Bulb,7,4.50
+L5122,2024-09-08,Garden,Trowel,6,9.00
+L5123,2024-09-04,Kitchen,Chopping Board,11,12.00
+L5124,2024-09-08,Hardware,LED Bulb,8,4.50
+L5125,2024-09-02,Garden,Watering Can,4,14.50
+L5126,2024-09-23,Stationery,Notebook,4,4.50
+L5127,2024-09-16,Garden,Trowel,9,9.00
+L5128,2024-09-01,Hardware,LED Bulb,7,5.00
+L5129,2024-09-28,Hardware,Screwdriver Set,4,22.00
+L5130,2024-09-14,Hardware,LED Bulb,6,5.00
+L5131,2024-09-27,Hardware,Screwdriver Set,9,21.50
+L5132,2024-09-18,Garden,Terracotta Pot,7,7.00
+L5133,2024-09-02,Garden,Trowel,3,8.50
+L5134,2024-09-03,Kitchen,Enamel Mug,5,7.50
+L5135,2024-10-14,Garden,Trowel,2,9.00
+L5136,2024-10-24,Garden,Watering Can,8,15.00
+L5137,2024-10-05,Hardware,Tape Measure,8,8.00
+L5138,2024-10-24,Garden,Terracotta Pot,2,7.00
+L5139,2024-10-07,Hardware,LED Bulb,6,5.00
+L5140,2024-10-05,Hardware,Screwdriver Set,7,21.50
+L5141,2024-10-07,Hardware,LED Bulb,11,5.00
+L5142,2024-10-07,Garden,Trowel,1,8.50
+L5143,2024-10-14,Garden,Watering Can,10,14.50
+L5144,2024-10-24,Garden,Trowel,10,9.00
+L5145,2024-10-26,Hardware,Tape Measure,11,8.00
+L5146,2024-10-26,Garden,Terracotta Pot,8,7.00
+L5147,2024-10-22,Hardware,Screwdriver Set,5,21.50
+L5148,2024-10-08,Stationery,Ink Pen,12,4.00
+L5149,2024-10-24,Kitchen,Cast Pan,11,38.00
+L5150,2024-10-09,Hardware,Screwdriver Set,11,22.00
+L5151,2024-10-25,Stationery,Ink Pen,10,4.00
+L5152,2024-10-04,Kitchen,Enamel Mug,3,7.50
+L5153,2024-10-05,Garden,Terracotta Pot,11,6.50
+L5154,2024-10-18,Kitchen,Chopping Board,3,12.00
+L5155,2024-11-25,Garden,Trowel,1,8.50
+L5156,2024-11-08,Garden,Terracotta Pot,3,6.50
+L5157,2024-11-15,Hardware,LED Bulb,12,4.50
+L5158,2024-11-26,Kitchen,Cast Pan,7,38.50
+L5159,2024-11-02,Hardware,Screwdriver Set,1,22.00
+L5160,2024-11-08,Garden,Watering Can,3,14.00
+L5161,2024-11-05,Hardware,Screwdriver Set,11,22.00
+L5162,2024-11-27,Kitchen,Enamel Mug,7,7.50
+L5163,2024-11-17,Hardware,Tape Measure,12,8.50
+L5164,2024-11-10,Hardware,LED Bulb,4,4.00
+L5165,2024-11-25,Hardware,Screwdriver Set,10,22.50
+L5166,2024-11-16,Hardware,Screwdriver Set,10,22.00
+L5167,2024-11-01,Stationery,Ink Pen,6,3.50
+L5168,2024-11-19,Hardware,Screwdriver Set,2,22.00
+L5169,2024-11-12,Kitchen,Enamel Mug,5,8.00
+L5170,2024-11-17,Kitchen,Cast Pan,1,38.50
+L5171,2024-11-12,Garden,Trowel,1,9.50
+L5172,2024-11-02,Hardware,Tape Measure,11,8.00
+L5173,2024-11-07,Kitchen,Chopping Board,3,12.00
+L5174,2024-11-20,Kitchen,Enamel Mug,12,7.00
+L5175,2024-11-13,Stationery,Notebook,9,5.00
+L5176,2024-12-18,Kitchen,Cast Pan,8,37.50
+L5177,2024-12-23,Garden,Terracotta Pot,2,6.00
+L5178,2024-12-12,Hardware,Screwdriver Set,2,22.50
+L5179,2024-12-12,Hardware,LED Bulb,7,4.00
+L5180,2024-12-25,Kitchen,Cast Pan,10,37.50
+L5181,2024-12-07,Hardware,Screwdriver Set,6,22.00
+L5182,2024-12-06,Hardware,Tape Measure,11,8.00
+L5183,2024-12-05,Kitchen,Enamel Mug,10,7.50
+L5184,2024-12-17,Hardware,Tape Measure,8,7.50
+L5185,2024-12-01,Stationery,Notebook,9,4.50
+L5186,2024-12-03,Stationery,Notebook,6,5.00
+L5187,2024-12-23,Stationery,Notebook,12,5.00
+L5188,2024-12-24,Stationery,Notebook,10,5.50
+L5189,2024-12-08,Hardware,LED Bulb,1,4.00
+L5190,2024-12-16,Kitchen,Chopping Board,3,12.00
+L5191,2024-12-08,Garden,Trowel,4,9.00
+L5192,2024-12-19,Garden,Watering Can,8,14.50
+L5193,2024-12-24,Garden,Terracotta Pot,12,6.50
+L5194,2024-12-28,Garden,Trowel,9,9.50
+L5195,2024-12-17,Hardware,Tape Measure,6,8.00
+L5196,2024-12-18,Hardware,Screwdriver Set,6,22.00
+L5197,2024-12-28,Hardware,LED Bulb,4,4.50
